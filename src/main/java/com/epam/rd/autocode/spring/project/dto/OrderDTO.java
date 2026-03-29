@@ -1,6 +1,34 @@
 package com.epam.rd.autocode.spring.project.dto;
 
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
-public class OrderDTO{
-    // TODO Place your code here
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderDTO {
+
+    @NotBlank
+    @Email
+    private String clientEmail;
+
+    @Email
+    private String employeeEmail;
+
+    @NotNull
+    private LocalDateTime orderDate;
+
+    @NotNull
+    @Positive
+    private BigDecimal price;
+
+    @NotEmpty
+    private List<BookItemDTO> bookItems;
 }
