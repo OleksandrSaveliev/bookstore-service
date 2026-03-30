@@ -7,6 +7,9 @@ import com.my.bookstore.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,12 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAll().stream()
                 .map(book -> modelMapper.map(book, BookDTO.class))
                 .toList();
+    }
+
+    public Page<BookDTO> getBooks(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return bookRepository.findAll(pageable)
+                .map(book -> modelMapper.map(book, BookDTO.class));
     }
 
     @Override

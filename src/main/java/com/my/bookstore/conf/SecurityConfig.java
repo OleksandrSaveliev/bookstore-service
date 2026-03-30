@@ -29,7 +29,13 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/","/api/login").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/api/login",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**")
+                        .permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin((withDefaults()));
@@ -47,16 +53,16 @@ public class SecurityConfig {
         return new ProviderManager(authenticationProvider);
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User
-                .withUsername("user")
-                .password(passwordEncoder().encode("123"))
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(userDetails);
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        UserDetails userDetails = User
+//                .withUsername("user")
+//                .password(passwordEncoder().encode("123"))
+//                .roles("USER")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(userDetails);
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
