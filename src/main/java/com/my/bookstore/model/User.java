@@ -11,9 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class User {
+public abstract class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,4 +26,5 @@ public class User {
 
     @Column(nullable = false)
     private String name;
+
 }
