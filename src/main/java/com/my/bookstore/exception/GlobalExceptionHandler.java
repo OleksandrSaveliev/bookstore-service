@@ -3,6 +3,7 @@ package com.my.bookstore.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -36,6 +37,18 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.builder()
                         .status(HttpStatus.CONFLICT.value())
                         .message(ex.getMessage())
+                        .timestamp(LocalDateTime.now())
+                        .build());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
+        log.error("Bad credentials: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.builder()
+                        .status(HttpStatus.UNAUTHORIZED.value())
+                        .message("Invalid email or password")
                         .timestamp(LocalDateTime.now())
                         .build());
     }
