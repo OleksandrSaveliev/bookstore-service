@@ -5,14 +5,12 @@ import com.my.bookstore.model.Employee;
 import com.my.bookstore.repo.EmployeeRepository;
 import com.my.bookstore.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
@@ -22,7 +20,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeDTO> getAllEmployees() {
-        log.info("Fetching all employees");
         return employeeRepository.findAll().stream()
                 .map(employee -> modelMapper.map(employee, EmployeeDTO.class))
                 .toList();
@@ -30,7 +27,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDTO getEmployeeByEmail(String email) {
-        log.info("Fetching employee by email: {}", email);
         Employee employee = employeeRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Employee not found: " + email));
         return modelMapper.map(employee, EmployeeDTO.class);
@@ -39,7 +35,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public EmployeeDTO updateEmployeeByEmail(String email, EmployeeDTO employeeDTO) {
-        log.info("Updating employee: {}", email);
         Employee employee = employeeRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Employee not found: " + email));
         modelMapper.map(employeeDTO, employee);
@@ -49,7 +44,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public void deleteEmployeeByEmail(String email) {
-        log.info("Deleting employee: {}", email);
         Employee employee = employeeRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Employee not found: " + email));
         employeeRepository.delete(employee);
@@ -58,7 +52,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public EmployeeDTO addEmployee(EmployeeDTO employeeDTO) {
-        log.info("Adding employee: {}", employeeDTO.getEmail());
         Employee employee = modelMapper.map(employeeDTO, Employee.class);
         return modelMapper.map(employeeRepository.save(employee), EmployeeDTO.class);
     }
