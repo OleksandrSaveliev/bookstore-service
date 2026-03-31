@@ -1,5 +1,47 @@
 package com.my.bookstore.controller;
 
+import com.my.bookstore.dto.ClientDTO;
+import com.my.bookstore.service.ClientService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/v1/clients")
 public class ClientController {
-    // TODO Place your code here
+
+    private final ClientService clientService;
+
+    @GetMapping
+    public ResponseEntity<List<ClientDTO>> getAllClients() {
+        return ResponseEntity.ok(clientService.getAllClients());
+    }
+
+    @GetMapping("/{email}")
+    public ResponseEntity<ClientDTO> getClientByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(clientService.getClientByEmail(email));
+    }
+
+    @PostMapping
+    public ResponseEntity<ClientDTO> addClient(@Valid @RequestBody ClientDTO clientDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(clientService.addClient(clientDTO));
+    }
+
+    @PutMapping("/{email}")
+    public ResponseEntity<ClientDTO> updateClient(@PathVariable String email,
+                                                  @Valid @RequestBody ClientDTO clientDTO) {
+        return ResponseEntity.ok(clientService.updateClientByEmail(email, clientDTO));
+    }
+
+    @DeleteMapping("/{email}")
+    public ResponseEntity<Void> deleteClient(@PathVariable String email) {
+        clientService.deleteClientByEmail(email);
+        return ResponseEntity.noContent().build();
+    }
 }
