@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>BookStore</title>
+    <title th:text="#{home.title}">BookStore</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
@@ -14,37 +14,36 @@
         <div class="logo">📚 BookStore</div>
 
         <div class="nav-actions">
-            <a th:href="@{/login}" class="btn ghost">Login</a>
-            <a th:href="@{/app}" class="btn primary">Open App</a>
+            <!-- Language switcher -->
+            <a th:href="@{/(lang=en)}" class="btn ghost">EN</a>
+            <a th:href="@{/(lang=ua)}" class="btn ghost">UA</a>
+
+            <a th:href="@{/login}" class="btn ghost" th:text="#{nav.login}">Login</a>
+            <a th:href="@{/app}" class="btn primary" th:text="#{nav.openApp}">Open App</a>
         </div>
     </header>
 
     <!-- HERO -->
     <section class="hero">
-
         <div class="hero-content">
-            <h1>Discover Your Next Favorite Book</h1>
-            <p class="subtitle">
+            <h1 th:text="#{home.headline}">Discover Your Next Favorite Book</h1>
+            <p class="subtitle" th:text="#{home.subtitle}">
                 Modern bookstore experience powered by Spring Boot & React.
             </p>
-
             <div class="actions">
-                <a th:href="@{/app}" class="btn primary">Start Exploring</a>
-                <a th:href="@{/api/books}" class="btn ghost">API</a>
+                <a th:href="@{/app}" class="btn primary" th:text="#{home.startExploring}">Start Exploring</a>
+                <a th:href="@{/api/v1/books}" class="btn ghost">API</a>
             </div>
         </div>
-
         <div class="hero-image">
-            <img src="/images/hero-image.webp"
-                 alt="Books">
+            <img src="/images/hero-image.webp" th:alt="#{home.heroAlt}">
         </div>
-
     </section>
 
     <!-- BOOKS -->
     <section class="books">
 
-        <h2>Featured Books</h2>
+        <h2 th:text="#{home.featured}">Featured Books</h2>
 
         <div class="grid">
             <div class="card" th:each="book : ${books}">
@@ -56,27 +55,22 @@
 
         <!-- PAGINATION -->
         <div class="pagination">
-
-            <!-- Prev -->
             <a th:if="${currentPage > 0}"
                th:href="@{/(page=${currentPage - 1}, size=${size})}"
-               class="btn ghost">
-                ← Prev
-            </a>
+               class="btn ghost"
+               th:text="#{home.prev}">← Prev</a>
 
-            <!-- Page numbers -->
             <span class="page-info">
-                Page <span th:text="${currentPage + 1}">1</span>
-                of <span th:text="${totalPages}">1</span>
+                <span th:text="#{home.page}">Page</span>
+                <span th:text="${currentPage + 1}">1</span>
+                <span th:text="#{home.of}">of</span>
+                <span th:text="${totalPages}">1</span>
             </span>
 
-            <!-- Next -->
             <a th:if="${currentPage < totalPages - 1}"
                th:href="@{/(page=${currentPage + 1}, size=${size})}"
-               class="btn ghost">
-                Next →
-            </a>
-
+               class="btn ghost"
+               th:text="#{home.next}">Next →</a>
         </div>
 
     </section>
