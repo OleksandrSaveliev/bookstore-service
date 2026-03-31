@@ -4,8 +4,6 @@ import com.my.bookstore.dto.ClientDTO;
 import com.my.bookstore.exception.AlreadyExistException;
 import com.my.bookstore.model.Client;
 import com.my.bookstore.repo.ClientRepository;
-import com.my.bookstore.security.JwtUtils;
-import com.my.bookstore.security.dto.JwtResponse;
 import com.my.bookstore.service.ClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
