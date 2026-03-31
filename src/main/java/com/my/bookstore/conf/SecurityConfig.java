@@ -6,6 +6,7 @@ import com.my.bookstore.service.impl.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -79,12 +80,15 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/api/v1/auth/**",
-                                "/api/v1/books/**",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
                                 "/h2-console/**")
                         .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/books/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/books/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/books/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/books/**").hasRole("EMPLOYEE")
                         .requestMatchers("/api/v1/employees/**").hasRole("EMPLOYEE")
                         .requestMatchers("/api/v1/clients/**").hasRole("EMPLOYEE")
                         .requestMatchers("/api/v1/orders/**").authenticated()

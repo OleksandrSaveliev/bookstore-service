@@ -46,11 +46,13 @@
         <h2 th:text="#{home.featured}">Featured Books</h2>
 
         <div class="grid">
-            <div class="card" th:each="book : ${books}">
+            <a th:each="book : ${books}"
+               th:href="@{/app/books/{name}(name=${book.name})}"
+               class="card">
                 <h3 th:text="${book.name}">Book Name</h3>
                 <p class="author" th:text="${book.author}">Author</p>
                 <p class="price" th:text="'$' + ${book.price}">$10</p>
-            </div>
+            </a>
         </div>
 
         <!-- PAGINATION -->

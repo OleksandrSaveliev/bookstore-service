@@ -95,6 +95,13 @@
     background: white;
 }
 
+a.card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
 .card:hover {
     transform: translateY(-3px);
     border-color: #ccc;
