@@ -1,40 +1,29 @@
-<configuration>
-
-    <!-- App name -->
-    <property name="APP_NAME" value="bookstore"/>
-
-    <!-- Log file location -->
-    <property name="LOG_PATH" value="logs"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <!-- Properties with sensible defaults -->
+    <property name="APP_NAME" value="${APP_NAME:-bookstore}"/>
+    <property name="LOG_PATH" value="${LOG_PATH:-logs}"/>
     <property name="LOG_FILE" value="${LOG_PATH}/${APP_NAME}.log"/>
 
-    <!-- Console Appender -->
+    <!-- Console appender with color coding -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>
-                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
-            </pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- File Appender with rolling policy -->
+    <!-- Rolling file appender -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_FILE}</file>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- daily rollover -->
-            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
-
-            <!-- keep 14 days -->
-            <maxHistory>14</maxHistory>
-
-            <!-- max total size -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
+            <maxFileSize>100MB</maxFileSize>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
         </rollingPolicy>
-
         <encoder>
-            <pattern>
-                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
-            </pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -44,11 +33,12 @@
         <appender-ref ref="FILE"/>
     </root>
 
-    <!-- Reduce Spring noise -->
-    <logger name="org.springframework" level="WARN"/>
-    <logger name="org.hibernate" level="WARN"/>
-
-    <!-- Your app logs (more detailed) -->
+    <!-- Application specific loggers -->
     <logger name="com.bookstore" level="DEBUG"/>
 
+    <!-- Framework loggers -->
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.springframework.web" level="INFO"/>
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.apache" level="WARN"/>
 </configuration>

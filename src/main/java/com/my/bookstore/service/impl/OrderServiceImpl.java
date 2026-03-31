@@ -9,14 +9,12 @@ import com.my.bookstore.repo.EmployeeRepository;
 import com.my.bookstore.repo.OrderRepository;
 import com.my.bookstore.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -29,7 +27,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDTO> getOrdersByClient(String clientEmail) {
-        log.info("Fetching orders for client: {}", clientEmail);
         return orderRepository.findAllByClient_Email(clientEmail).stream()
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .toList();
@@ -37,7 +34,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDTO> getOrdersByEmployee(String employeeEmail) {
-        log.info("Fetching orders for employee: {}", employeeEmail);
         return orderRepository.findAllByEmployee_Email(employeeEmail).stream()
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .toList();
@@ -46,7 +42,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDTO addOrder(OrderDTO orderDTO) {
-        log.info("Adding order for client: {}", orderDTO.getClientEmail());
 
         Client client = clientRepository.findByEmail(orderDTO.getClientEmail())
                 .orElseThrow(() -> new RuntimeException("Client not found: " + orderDTO.getClientEmail()));

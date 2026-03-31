@@ -79,6 +79,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/api/v1/auth/**",
+                                "/api/v1/books/**",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
@@ -87,7 +88,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/employees/**").hasRole("EMPLOYEE")
                         .requestMatchers("/api/v1/clients/**").hasRole("EMPLOYEE")
                         .requestMatchers("/api/v1/orders/**").authenticated()
-                        .requestMatchers("/api/v1/books/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable);

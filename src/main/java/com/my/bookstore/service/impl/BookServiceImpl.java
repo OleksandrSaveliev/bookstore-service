@@ -5,7 +5,6 @@ import com.my.bookstore.model.Book;
 import com.my.bookstore.repo.BookRepository;
 import com.my.bookstore.service.BookService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
@@ -25,7 +23,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookDTO> getAllBooks() {
-        log.info("Fetching all books");
         return bookRepository.findAll().stream()
                 .map(book -> modelMapper.map(book, BookDTO.class))
                 .toList();
@@ -39,7 +36,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDTO getBookByName(String name) {
-        log.info("Fetching book by name: {}", name);
         Book book = bookRepository.findByName(name)
                 .orElseThrow(() -> new RuntimeException("Book not found: " + name));
         return modelMapper.map(book, BookDTO.class);
@@ -48,7 +44,6 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public BookDTO updateBookByName(String name, BookDTO bookDTO) {
-        log.info("Updating book: {}", name);
         Book book = bookRepository.findByName(name)
                 .orElseThrow(() -> new RuntimeException("Book not found: " + name));
         modelMapper.map(bookDTO, book);
@@ -58,7 +53,6 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public void deleteBookByName(String name) {
-        log.info("Deleting book: {}", name);
         Book book = bookRepository.findByName(name)
                 .orElseThrow(() -> new RuntimeException("Book not found: " + name));
         bookRepository.delete(book);
@@ -67,7 +61,6 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public BookDTO addBook(BookDTO bookDTO) {
-        log.info("Adding book: {}", bookDTO.getName());
         Book book = modelMapper.map(bookDTO, Book.class);
         return modelMapper.map(bookRepository.save(book), BookDTO.class);
     }

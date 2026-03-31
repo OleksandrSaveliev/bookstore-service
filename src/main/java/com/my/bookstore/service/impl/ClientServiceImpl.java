@@ -6,7 +6,6 @@ import com.my.bookstore.model.Client;
 import com.my.bookstore.repo.ClientRepository;
 import com.my.bookstore.service.ClientService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
@@ -25,7 +23,6 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public List<ClientDTO> getAllClients() {
-        log.info("Fetching all clients");
         return clientRepository.findAll().stream()
                 .map(client -> modelMapper.map(client, ClientDTO.class))
                 .toList();
@@ -33,7 +30,6 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ClientDTO getClientByEmail(String email) {
-        log.info("Fetching client by email: {}", email);
         Client client = clientRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Client not found: " + email));
         return modelMapper.map(client, ClientDTO.class);
@@ -42,7 +38,6 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDTO updateClientByEmail(String email, ClientDTO clientDTO) {
-        log.info("Updating client: {}", email);
         Client client = clientRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Client not found: " + email));
         modelMapper.map(clientDTO, client);
@@ -52,7 +47,6 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public void deleteClientByEmail(String email) {
-        log.info("Deleting client: {}", email);
         Client client = clientRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Client not found: " + email));
         clientRepository.delete(client);
@@ -61,7 +55,6 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDTO addClient(ClientDTO clientDTO) {
-        log.info("Adding client: {}", clientDTO.getEmail());
         if (clientRepository.existsByEmail(clientDTO.getEmail())) {
             throw new AlreadyExistException("Client already exists: " + clientDTO.getEmail());
         }
