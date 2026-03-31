@@ -17,13 +17,13 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @GetMapping("/client/{email}")
-    public ResponseEntity<List<OrderDTO>> getOrdersByClient(@PathVariable String email) {
+    @GetMapping("/client")
+    public ResponseEntity<List<OrderDTO>> getOrdersByClient(@RequestParam String email) {
         return ResponseEntity.ok(orderService.getOrdersByClient(email));
     }
 
-    @GetMapping("/employee/{email}")
-    public ResponseEntity<List<OrderDTO>> getOrdersByEmployee(@PathVariable String email) {
+    @GetMapping("/employee")
+    public ResponseEntity<List<OrderDTO>> getOrdersByEmployee(@RequestParam String email) {
         return ResponseEntity.ok(orderService.getOrdersByEmployee(email));
     }
 

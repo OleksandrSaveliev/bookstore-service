@@ -22,8 +22,8 @@ public class ClientController {
         return ResponseEntity.ok(clientService.getAllClients());
     }
 
-    @GetMapping("/{email}")
-    public ResponseEntity<ClientDTO> getClientByEmail(@PathVariable String email) {
+    @GetMapping("/by_email")
+    public ResponseEntity<ClientDTO> getClientByEmail(@RequestParam String email) {
         return ResponseEntity.ok(clientService.getClientByEmail(email));
     }
 
@@ -33,14 +33,14 @@ public class ClientController {
                 .body(clientService.addClient(clientDTO));
     }
 
-    @PutMapping("/{email}")
-    public ResponseEntity<ClientDTO> updateClient(@PathVariable String email,
+    @PutMapping("/by_email")
+    public ResponseEntity<ClientDTO> updateClient(@RequestParam String email,
                                                   @Valid @RequestBody ClientDTO clientDTO) {
         return ResponseEntity.ok(clientService.updateClientByEmail(email, clientDTO));
     }
 
-    @DeleteMapping("/{email}")
-    public ResponseEntity<Void> deleteClient(@PathVariable String email) {
+    @DeleteMapping("/by_email")
+    public ResponseEntity<Void> deleteClient(@RequestParam String email) {
         clientService.deleteClientByEmail(email);
         return ResponseEntity.noContent().build();
     }

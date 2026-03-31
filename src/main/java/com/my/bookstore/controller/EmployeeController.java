@@ -22,25 +22,25 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
-    @GetMapping("/{email}")
-    public ResponseEntity<EmployeeDTO> getEmployeeByEmail(@PathVariable String email) {
+    @GetMapping("/by_email")
+    public ResponseEntity<EmployeeDTO> getEmployeeByEmail(@RequestParam String email) {
         return ResponseEntity.ok(employeeService.getEmployeeByEmail(email));
     }
 
     @PostMapping
-    public ResponseEntity<EmployeeDTO> addEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<EmployeeDTO> addEmployee(@Valid @RequestParam EmployeeDTO employeeDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(employeeService.addEmployee(employeeDTO));
     }
 
-    @PutMapping("/{email}")
-    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable String email,
+    @PutMapping("/by_email")
+    public ResponseEntity<EmployeeDTO> updateEmployee(@RequestParam String email,
                                                       @Valid @RequestBody EmployeeDTO employeeDTO) {
         return ResponseEntity.ok(employeeService.updateEmployeeByEmail(email, employeeDTO));
     }
 
-    @DeleteMapping("/{email}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable String email) {
+    @DeleteMapping("/by_email")
+    public ResponseEntity<Void> deleteEmployee(@RequestParam String email) {
         employeeService.deleteEmployeeByEmail(email);
         return ResponseEntity.noContent().build();
     }
