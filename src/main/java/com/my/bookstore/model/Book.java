@@ -41,6 +41,8 @@ public class Book {
     @Column(name = "number_of_pages")
     private Integer pages;
 
+    private Integer stock;
+
     private String characteristics;
 
     private String description;
