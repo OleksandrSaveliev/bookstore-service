@@ -2,6 +2,7 @@ package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.ClientDTO;
 import com.my.bookstore.exception.AlreadyExistException;
+import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.Client;
 import com.my.bookstore.repo.ClientRepository;
 import com.my.bookstore.service.ClientService;
@@ -29,26 +30,30 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public ClientDTO getClientByEmail(String email) {
-        Client client = clientRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Client not found: " + email));
+    public ClientDTO getClientById(Long id) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Client not found: " + id));
         return modelMapper.map(client, ClientDTO.class);
     }
 
     @Override
     @Transactional
-    public ClientDTO updateClientByEmail(String email, ClientDTO clientDTO) {
-        Client client = clientRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Client not found: " + email));
+    public ClientDTO updateClientById(Long id, ClientDTO clientDTO) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Client not found: " + id));
         modelMapper.map(clientDTO, client);
+        client.setId(id);
+        if (clientDTO.getPassword() != null && !clientDTO.getPassword().isEmpty()) {
+            client.setPassword(passwordEncoder.encode(clientDTO.getPassword()));
+        }
         return modelMapper.map(clientRepository.save(client), ClientDTO.class);
     }
 
     @Override
     @Transactional
-    public void deleteClientByEmail(String email) {
-        Client client = clientRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Client not found: " + email));
+    public void deleteClientById(Long id) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Client not found: " + id));
         clientRepository.delete(client);
     }
 

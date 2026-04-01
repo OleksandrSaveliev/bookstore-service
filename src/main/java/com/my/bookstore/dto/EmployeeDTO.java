@@ -17,6 +17,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class EmployeeDTO {
 
+    private Long id;
+
     @NotBlank
     @Email
     private String email;

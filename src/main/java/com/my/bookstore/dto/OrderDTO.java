@@ -15,12 +15,12 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderDTO {
 
-    @NotBlank
-    @Email
-    private String clientEmail;
+    private Long id;
 
-    @Email
-    private String employeeEmail;
+    @NotNull
+    private Long clientId;
+
+    private Long employeeId;
 
     @NotNull
     private LocalDateTime orderDate;

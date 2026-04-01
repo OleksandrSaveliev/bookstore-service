@@ -1,6 +1,7 @@
 package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.BookDTO;
+import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.Book;
 import com.my.bookstore.repo.BookRepository;
 import com.my.bookstore.service.BookService;
@@ -35,26 +36,27 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookDTO getBookByName(String name) {
-        Book book = bookRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Book not found: " + name));
+    public BookDTO getBookById(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Book not found: " + id));
         return modelMapper.map(book, BookDTO.class);
     }
 
     @Override
     @Transactional
-    public BookDTO updateBookByName(String name, BookDTO bookDTO) {
-        Book book = bookRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Book not found: " + name));
+    public BookDTO updateBookById(Long id, BookDTO bookDTO) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Book not found: " + id));
         modelMapper.map(bookDTO, book);
+        book.setId(id);
         return modelMapper.map(bookRepository.save(book), BookDTO.class);
     }
 
     @Override
     @Transactional
-    public void deleteBookByName(String name) {
-        Book book = bookRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Book not found: " + name));
+    public void deleteBookById(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Book not found: " + id));
         bookRepository.delete(book);
     }
 

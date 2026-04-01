@@ -14,7 +14,7 @@ import lombok.Setter;
 public class BookItemDTO {
 
     @NotNull
-    private String bookName;
+    private Long bookId;
 
     @NotNull
     @Positive
