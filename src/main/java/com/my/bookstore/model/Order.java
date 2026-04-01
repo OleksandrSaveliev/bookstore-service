@@ -10,7 +10,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = "bookItems")
 @Entity
 @Table(name = "orders")
 public class Order {

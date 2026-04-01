@@ -7,7 +7,6 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = "order")
 @Entity
 @Table(name = "book_items")
 public class BookItem {
