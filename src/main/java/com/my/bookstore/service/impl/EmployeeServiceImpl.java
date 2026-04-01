@@ -1,6 +1,7 @@
 package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.EmployeeDTO;
+import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.Employee;
 import com.my.bookstore.repo.EmployeeRepository;
 import com.my.bookstore.service.EmployeeService;
@@ -26,26 +27,27 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDTO getEmployeeByEmail(String email) {
-        Employee employee = employeeRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Employee not found: " + email));
+    public EmployeeDTO getEmployeeById(Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
         return modelMapper.map(employee, EmployeeDTO.class);
     }
 
     @Override
     @Transactional
-    public EmployeeDTO updateEmployeeByEmail(String email, EmployeeDTO employeeDTO) {
-        Employee employee = employeeRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Employee not found: " + email));
+    public EmployeeDTO updateEmployeeById(Long id, EmployeeDTO employeeDTO) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
         modelMapper.map(employeeDTO, employee);
+        employee.setId(id);
         return modelMapper.map(employeeRepository.save(employee), EmployeeDTO.class);
     }
 
     @Override
     @Transactional
-    public void deleteEmployeeByEmail(String email) {
-        Employee employee = employeeRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Employee not found: " + email));
+    public void deleteEmployeeById(Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
         employeeRepository.delete(employee);
     }
 

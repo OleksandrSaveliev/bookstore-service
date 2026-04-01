@@ -2,6 +2,7 @@ package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.BookItemDTO;
 import com.my.bookstore.dto.OrderDTO;
+import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.*;
 import com.my.bookstore.repo.BookRepository;
 import com.my.bookstore.repo.ClientRepository;
@@ -26,15 +27,22 @@ public class OrderServiceImpl implements OrderService {
     private final ModelMapper modelMapper;
 
     @Override
-    public List<OrderDTO> getOrdersByClient(String clientEmail) {
-        return orderRepository.findAllByClient_Email(clientEmail).stream()
+    public List<OrderDTO> getAllOrders() {
+        return orderRepository.findAll().stream()
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .toList();
     }
 
     @Override
-    public List<OrderDTO> getOrdersByEmployee(String employeeEmail) {
-        return orderRepository.findAllByEmployee_Email(employeeEmail).stream()
+    public List<OrderDTO> getOrdersByClientId(Long clientId) {
+        return orderRepository.findAllByClientId(clientId).stream()
+                .map(order -> modelMapper.map(order, OrderDTO.class))
+                .toList();
+    }
+
+    @Override
+    public List<OrderDTO> getOrdersByEmployeeId(Long employeeId) {
+        return orderRepository.findAllByEmployeeId(employeeId).stream()
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .toList();
     }
@@ -43,11 +51,14 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDTO addOrder(OrderDTO orderDTO) {
 
-        Client client = clientRepository.findByEmail(orderDTO.getClientEmail())
-                .orElseThrow(() -> new RuntimeException("Client not found: " + orderDTO.getClientEmail()));
+        Client client = clientRepository.findById(orderDTO.getClientId())
+                .orElseThrow(() -> new NotFoundException("Client not found: " + orderDTO.getClientId()));
 
-        Employee employee = employeeRepository.findByEmail(orderDTO.getEmployeeEmail())
-                .orElseThrow(() -> new RuntimeException("Employee not found: " + orderDTO.getEmployeeEmail()));
+        Employee employee = null;
+        if (orderDTO.getEmployeeId() != null) {
+            employee = employeeRepository.findById(orderDTO.getEmployeeId())
+                    .orElseThrow(() -> new NotFoundException("Employee not found: " + orderDTO.getEmployeeId()));
+        }
 
         Order order = new Order();
         order.setClient(client);
@@ -62,8 +73,8 @@ public class OrderServiceImpl implements OrderService {
     private List<BookItem> mapBookItems(List<BookItemDTO> itemDTOs, Order order) {
         return itemDTOs.stream()
                 .map(itemDTO -> {
-                    Book book = bookRepository.findByName(itemDTO.getBookName())
-                            .orElseThrow(() -> new RuntimeException("Book not found: " + itemDTO.getBookName()));
+                    Book book = bookRepository.findById(itemDTO.getBookId())
+                            .orElseThrow(() -> new NotFoundException("Book not found: " + itemDTO.getBookId()));
                     BookItem item = new BookItem();
                     item.setBook(book);
                     item.setQuantity(itemDTO.getQuantity());

@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class ClientDTO {
 
+    private Long id;
+
     @NotBlank
     @Email
     private String email;

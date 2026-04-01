@@ -73,9 +73,9 @@ public class OrderDTOTest {
         final var parameters = Arrays.asList(constructor.getParameters());
 
         parameters.stream()
-                .filter(p -> p.getType().getTypeName().equals(com.my.bookstore.dto.Constants.STRING_TYPE))
+                .filter(p -> p.getType().getTypeName().equals(com.my.bookstore.dto.Constants.LONG_TYPE))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No parameter with type " + com.my.bookstore.dto.Constants.STRING_TYPE));
+                .orElseThrow(() -> new RuntimeException("No parameter with type " + com.my.bookstore.dto.Constants.LONG_TYPE));
 
         parameters.stream()
                 .filter(p -> p.getType().getTypeName().equals(com.my.bookstore.dto.Constants.BIG_DECIMAL_TYPE))
@@ -87,7 +87,7 @@ public class OrderDTOTest {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No parameter with type " + com.my.bookstore.dto.Constants.LOCAL_DATE_TIME_TYPE));
 
-        assertEquals(5, parameters.size());
+        assertEquals(6, parameters.size());
     }
 
     @Test
@@ -109,8 +109,9 @@ public class OrderDTOTest {
     @DisplayName("Check field type and field name")
     @ParameterizedTest
     @CsvSource({
-            "java.lang.String, clientEmail, 1",
-            "java.lang.String, employeeEmail, 1",
+            "java.lang.Long, id, 1",
+            "java.lang.Long, clientId, 1",
+            "java.lang.Long, employeeId, 1",
             "java.time.LocalDateTime, orderDate, 1",
             "java.math.BigDecimal, price, 1",
             "java.util.List, bookItems, 1"

@@ -20,6 +20,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class BookDTO {
 
+    private Long id;
+
     @NotBlank
     private String name;
 
