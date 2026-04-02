@@ -13,4 +13,6 @@ public interface OrderService {
     OrderDTO addOrder(OrderDTO order);
 
     List<OrderDTO> getAllOrders();
+
+    org.springframework.data.domain.Page<OrderDTO> getOrders(int page, int size, String sortBy, String sortDir);
 }

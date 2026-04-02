@@ -1,6 +1,5 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.BookItemDTO;
 import com.my.bookstore.dto.OrderDTO;
 import com.my.bookstore.exception.LowBalanceException;
 import com.my.bookstore.exception.NotFoundException;
@@ -13,6 +12,10 @@ import com.my.bookstore.repo.OrderRepository;
 import com.my.bookstore.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-private final OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
     private final EmployeeRepository employeeRepository;
     private final BookRepository bookRepository;
@@ -34,6 +37,16 @@ private final OrderRepository orderRepository;
         return orderRepository.findAll().stream()
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .toList();
+    }
+
+    @Override
+    public Page<OrderDTO> getOrders(int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return orderRepository.findAll(pageable)
+                .map(order -> modelMapper.map(order, OrderDTO.class));
     }
 
     @Override

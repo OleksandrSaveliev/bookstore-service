@@ -17,5 +17,5 @@ public interface BookService {
 
     BookDTO addBook(BookDTO book);
 
-    Page<BookDTO> getBooks(int page, int size);
+    Page<BookDTO> getBooks(int page, int size, String sortBy, String sortDir);
 }

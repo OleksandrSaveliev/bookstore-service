@@ -25,7 +25,7 @@ public class HomeController {
             Model model
     ) {
 
-        Page<BookDTO> booksPage = bookService.getBooks(page, size);
+        Page<BookDTO> booksPage = bookService.getBooks(page, size, "id", "asc");
 
         model.addAttribute("books", booksPage.getContent());
         model.addAttribute("currentPage", booksPage.getNumber());

@@ -4,6 +4,9 @@ import com.my.bookstore.dto.BookDTO;
 import com.my.bookstore.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +20,19 @@ public class BookController {
 
     private final BookService bookService;
 
+//    @GetMapping
+//    public ResponseEntity<List<BookDTO>> getAllBooks() {
+//        return ResponseEntity.ok(bookService.getAllBooks());
+//    }
+
     @GetMapping
-    public ResponseEntity<List<BookDTO>> getAllBooks() {
-        return ResponseEntity.ok(bookService.getAllBooks());
+    public Page<BookDTO> getBooks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        return bookService.getBooks(page, size, sortBy, sortDir);
     }
 
     @GetMapping("/{id}")

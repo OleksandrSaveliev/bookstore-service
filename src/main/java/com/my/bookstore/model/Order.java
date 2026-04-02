@@ -26,6 +26,7 @@ public class Order {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
+    @Column(name = "order_date")
     private LocalDateTime orderDate;
 
     private BigDecimal price;

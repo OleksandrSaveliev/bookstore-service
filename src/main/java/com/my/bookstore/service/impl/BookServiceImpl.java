@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +30,11 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
-    public Page<BookDTO> getBooks(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<BookDTO> getBooks(int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
         return bookRepository.findAll(pageable)
                 .map(book -> modelMapper.map(book, BookDTO.class));
     }
