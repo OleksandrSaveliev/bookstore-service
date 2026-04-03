@@ -1,6 +1,8 @@
 package com.my.bookstore.service;
 
 import com.my.bookstore.dto.OrderDTO;
+import com.my.bookstore.dto.OrderRequestDTO;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -10,9 +12,9 @@ public interface OrderService {
 
     List<OrderDTO> getOrdersByEmployeeId(Long employeeId);
 
-    OrderDTO addOrder(OrderDTO order);
+    OrderDTO addOrder(OrderRequestDTO order);
 
     List<OrderDTO> getAllOrders();
 
-    org.springframework.data.domain.Page<OrderDTO> getOrders(int page, int size, String sortBy, String sortDir);
+    Page<OrderDTO> getOrders(int page, int size, String sortBy, String sortDir);
 }

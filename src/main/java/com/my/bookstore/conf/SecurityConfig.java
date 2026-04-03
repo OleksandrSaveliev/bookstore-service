@@ -90,7 +90,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/books/**").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/books/**").hasRole("EMPLOYEE")
                         .requestMatchers("/api/v1/employees/**").hasRole("EMPLOYEE")
-                        .requestMatchers("/api/v1/clients/**").hasRole("EMPLOYEE")
+                        .requestMatchers("/api/v1/clients/**").hasAnyRole("EMPLOYEE", "CLIENT")
                         .requestMatchers("/api/v1/orders/**").authenticated()
                         .anyRequest().authenticated()
                 )

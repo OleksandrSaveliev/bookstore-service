@@ -1,6 +1,7 @@
 package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.ClientDTO;
+import com.my.bookstore.dto.SignupRequestDTO;
 import com.my.bookstore.exception.AlreadyExistException;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.Client;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -65,6 +67,24 @@ public class ClientServiceImpl implements ClientService {
         }
         Client client = modelMapper.map(clientDTO, Client.class);
         client.setPassword(passwordEncoder.encode(clientDTO.getPassword()));
+        return modelMapper.map(clientRepository.save(client), ClientDTO.class);
+    }
+
+    @Override
+    @Transactional
+    public ClientDTO registerClient(SignupRequestDTO signupRequest) {
+
+        if (clientRepository.existsByEmail(signupRequest.getEmail())) {
+            throw new AlreadyExistException("Email already in use: " + signupRequest.getEmail());
+        }
+
+        Client client = new Client();
+        client.setName(signupRequest.getName());
+        client.setEmail(signupRequest.getEmail());
+        client.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+
+        client.setBalance(BigDecimal.ZERO);
+
         return modelMapper.map(clientRepository.save(client), ClientDTO.class);
     }
 }

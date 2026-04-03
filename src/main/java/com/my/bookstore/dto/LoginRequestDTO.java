@@ -1,7 +1,8 @@
-package com.my.bookstore.security.dto;
+package com.my.bookstore.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,7 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class LoginRequest {
+@AllArgsConstructor
+public class LoginRequestDTO {
     @NotBlank
     @Email
     private String email;

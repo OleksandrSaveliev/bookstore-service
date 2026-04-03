@@ -1,6 +1,8 @@
 package com.my.bookstore.controller;
 
+import com.my.bookstore.dto.AuthResponseDTO;
 import com.my.bookstore.dto.ClientDTO;
+import com.my.bookstore.dto.SignupRequestDTO;
 import com.my.bookstore.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

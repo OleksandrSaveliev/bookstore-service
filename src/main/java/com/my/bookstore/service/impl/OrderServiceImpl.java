@@ -1,13 +1,14 @@
 package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.OrderDTO;
+import com.my.bookstore.dto.OrderRequestDTO;
+import com.my.bookstore.dto.OrderItemRequestDTO;
 import com.my.bookstore.exception.LowBalanceException;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.exception.OutOfStockException;
 import com.my.bookstore.model.*;
 import com.my.bookstore.repo.BookRepository;
 import com.my.bookstore.repo.ClientRepository;
-import com.my.bookstore.repo.EmployeeRepository;
 import com.my.bookstore.repo.OrderRepository;
 import com.my.bookstore.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +32,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
-    private final EmployeeRepository employeeRepository;
     private final BookRepository bookRepository;
     private final ModelMapper modelMapper;
 
@@ -65,55 +68,69 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO addOrder(OrderDTO orderDTO) {
-        Client client = clientRepository.findById(orderDTO.getClientId())
-                .orElseThrow(() -> new NotFoundException("Client not found: " + orderDTO.getClientId()));
+    public OrderDTO addOrder(OrderRequestDTO requestDTO) {
 
-        Employee employee = null;
-        if (orderDTO.getEmployeeId() != null) {
-            employee = employeeRepository.findById(orderDTO.getEmployeeId())
-                    .orElseThrow(() -> new NotFoundException("Employee not found: " + orderDTO.getEmployeeId()));
-        }
+        // 1. Get the current logged-in user's email from SecurityContext
+        String email = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication().getName();
+
+        // 2. Find the client by email (ensures they can only buy for themselves)
+        Client client = clientRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Client not found for email: " + email + ". Only clients can place orders."));
 
         Order order = new Order();
         order.setClient(client);
-        order.setEmployee(employee);
-        order.setOrderDate(orderDTO.getOrderDate());
+        order.setOrderDate(LocalDateTime.now()); // Consider using Instant for UTC consistency
 
-        List<BookItem> bookItems = orderDTO.getBookItems().stream()
-                .map(itemDTO -> {
-                    Book book = bookRepository.findById(itemDTO.getBookId())
-                            .orElseThrow(() -> new NotFoundException("Book not found: " + itemDTO.getBookId()));
+        // 3. Collect book IDs and batch fetch books
+        List<Long> bookIds = requestDTO.getItems().stream()
+                .map(OrderItemRequestDTO::getBookId)
+                .distinct()
+                .toList();
+        Map<Long, Book> bookMap = bookRepository.findAllById(bookIds).stream()
+                .collect(Collectors.toMap(Book::getId, book -> book));
 
-                    if (book.getStock() < itemDTO.getQuantity()) {
-                        throw new OutOfStockException("Not enough stock for book: " + book.getName());
+        // 4. Map Request Items to BookItem Entities with stock checks
+        List<BookItem> bookItems = requestDTO.getItems().stream()
+                .map(itemReq -> {
+                    Book book = bookMap.get(itemReq.getBookId());
+                    if (book == null) {
+                        throw new NotFoundException("Book ID " + itemReq.getBookId() + " not found");
                     }
-
-                    book.setStock(book.getStock() - itemDTO.getQuantity());
-                    bookRepository.save(book);
+                    if (book.getStock() < itemReq.getQuantity()) {
+                        throw new OutOfStockException("Not enough stock for: " + book.getName());
+                    }
+                    // Update stock
+                    book.setStock(book.getStock() - itemReq.getQuantity());
 
                     BookItem item = new BookItem();
                     item.setBook(book);
-                    item.setQuantity(itemDTO.getQuantity());
+                    item.setQuantity(itemReq.getQuantity());
                     item.setOrder(order);
                     return item;
                 })
                 .toList();
 
+        // 5. Calculate Price
         BigDecimal totalPrice = bookItems.stream()
                 .map(item -> item.getBook().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        // 6. Check Balance
         if (client.getBalance().compareTo(totalPrice) < 0) {
-            throw new LowBalanceException("Client balance is too low: " + client.getBalance());
+            throw new LowBalanceException("Insufficient balance. Required: " + totalPrice + ", Available: " + client.getBalance());
         }
 
+        // 7. Finalize
         client.setBalance(client.getBalance().subtract(totalPrice));
-        clientRepository.save(client);
-
         order.setPrice(totalPrice);
         order.setBookItems(bookItems);
 
-        return modelMapper.map(orderRepository.save(order), OrderDTO.class);
+        Order savedOrder = orderRepository.save(order);
+        // Log success
+        System.out.println("Order created successfully: ID=" + savedOrder.getId() + ", Total=" + totalPrice); // Replace with proper logging
+
+        return modelMapper.map(savedOrder, OrderDTO.class);
     }
+
 }

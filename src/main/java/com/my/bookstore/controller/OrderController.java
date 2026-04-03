@@ -1,6 +1,7 @@
 package com.my.bookstore.controller;
 
 import com.my.bookstore.dto.OrderDTO;
+import com.my.bookstore.dto.OrderRequestDTO;
 import com.my.bookstore.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,8 +45,8 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderDTO> addOrder(@Valid @RequestBody OrderDTO orderDTO) {
+    public ResponseEntity<OrderDTO> addOrder(@Valid @RequestBody OrderRequestDTO requestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(orderService.addOrder(orderDTO));
+                .body(orderService.addOrder(requestDTO));
     }
 }

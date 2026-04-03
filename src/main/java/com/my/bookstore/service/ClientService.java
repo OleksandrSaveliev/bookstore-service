@@ -1,6 +1,7 @@
 package com.my.bookstore.service;
 
 import com.my.bookstore.dto.ClientDTO;
+import com.my.bookstore.dto.SignupRequestDTO;
 
 import java.util.List;
 
@@ -15,4 +16,7 @@ public interface ClientService {
     void deleteClientById(Long id);
 
     ClientDTO addClient(ClientDTO client);
+
+    ClientDTO registerClient(SignupRequestDTO signupRequest);
+
 }
