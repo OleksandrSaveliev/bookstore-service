@@ -1,80 +1,77 @@
-INSERT INTO EMPLOYEES (ID, BIRTH_DATE, EMAIL, NAME, PASSWORD, PHONE)
-VALUES (1, '1990-05-15', 'john.doe@email.com', 'John Doe', 'pass123', '555-123-4567'),
-       (2, '1985-09-20', 'jane.smith@email.com', 'Jane Smith', 'abc456', '555-987-6543'),
-       (3, '1978-03-08', 'bob.jones@email.com', 'Bob Jones', 'qwerty789', '555-321-6789'),
-       (4, '1982-11-25', 'alice.white@email.com', 'Alice White', 'secret567', '555-876-5432'),
-       (5, '1995-07-12', 'mike.wilson@email.com', 'Mike Wilson', 'mypassword', '555-234-5678'),
-       (6, '1989-01-30', 'sara.brown@email.com', 'Sara Brown', 'letmein123', '555-876-5433'),
-       (7, '1975-06-18', 'tom.jenkins@email.com', 'Tom Jenkins', 'pass4321', '555-345-6789'),
-       (8, '1987-12-04', 'lisa.taylor@email.com', 'Lisa Taylor', 'securepwd', '555-789-0123'),
-       (9, '1992-08-22', 'david.wright@email.com', 'David Wright', 'access123', '555-456-7890'),
-       (10, '1980-04-10', 'emily.harris@email.com', 'Emily Harris', '1234abcd', '555-098-7654');
+-- ============================================================
+-- SEED DATA
+-- Password for all users: password123
+-- BCrypt hash of 'password123'
+-- ============================================================
 
-INSERT INTO CLIENTS (ID, BALANCE, EMAIL, NAME, PASSWORD)
-VALUES (11, 1000.00, 'client1@example.com', 'Medelyn Wright', 'password123'),
-       (12, 1500.50, 'client2@example.com', 'Landon Phillips', 'securepass'),
-       (13, 800.75, 'client3@example.com', 'Harmony Mason', 'abc123'),
-       (14, 1200.25, 'client4@example.com', 'Archer Harper', 'pass456'),
-       (15, 900.80, 'client5@example.com', 'Kira Jacobs', 'letmein789'),
-       (16, 1100.60, 'client6@example.com', 'Maximus Kelly', 'adminpass'),
-       (17, 1300.45, 'client7@example.com', 'Sierra Mitchell', 'mypassword'),
-       (18, 950.30, 'client8@example.com', 'Quinton Saunders', 'test123'),
-       (19, 1050.90, 'client9@example.com', 'Amina Clarke', 'qwerty123'),
-       (20, 880.20, 'client10@example.com', 'Bryson Chavez', 'pass789');
+-- ============================================================
+-- USERS
+-- ============================================================
+INSERT INTO users (email, password, role) VALUES
+                                              ('employee@bookstore.com', '$2a$10$wvpSaiTftBQRPe1VerIey.Nx5TnclSEouhQN35O4.9WqAcEiefVxu', 'EMPLOYEE'),
+                                              ('client@bookstore.com',   '$2a$10$wvpSaiTftBQRPe1VerIey.Nx5TnclSEouhQN35O4.9WqAcEiefVxu', 'CLIENT');
 
--- First 10 Books
-INSERT INTO BOOKS (name, genre, age_group, price, publication_year, author, number_of_pages, characteristics, description, language, stock)
-VALUES ('The Hidden Treasure', 'Adventure', 'ADULT', 24.99, '2018-05-15', 'Emily White', 400, 'Mysterious journey', 'An enthralling adventure of discovery', 'ENGLISH', 25),
-       ('Echoes of Eternity', 'Fantasy', 'TEEN', 16.50, '2011-01-15', 'Daniel Black', 350, 'Magical realms', 'A spellbinding tale of magic and destiny', 'ENGLISH', 15),
-       ('Whispers in the Shadows', 'Mystery', 'ADULT', 29.95, '2018-08-11', 'Sophia Green', 450, 'Intriguing suspense', 'A gripping mystery that keeps you guessing', 'ENGLISH', 10),
-       ('The Starlight Sonata', 'Romance', 'ADULT', 21.75, '2011-05-15', 'Michael Rose', 320, 'Heartwarming love story', 'A beautiful journey of love and passion', 'ENGLISH', 30),
-       ('Beyond the Horizon', 'Science Fiction', 'CHILD', 18.99, '2004-05-15', 'Alex Carter', 280, 'Interstellar adventure', 'An epic sci-fi adventure beyond the stars', 'ENGLISH', 50),
-       ('Dancing with Shadows', 'Thriller', 'ADULT', 26.50, '2015-05-15', 'Olivia Smith', 380, 'Suspenseful twists', 'A thrilling tale of danger and intrigue', 'ENGLISH', 12),
-       ('Voices in the Wind', 'Historical Fiction', 'ADULT', 32.00, '2017-05-15', 'William Turner', 500, 'Rich historical setting', 'A compelling journey through time', 'ENGLISH', 8),
-       ('Serenade of Souls', 'Fantasy', 'TEEN', 15.99, '2013-05-15', 'Isabella Reed', 330, 'Enchanting realms', 'A magical fantasy filled with wonder', 'ENGLISH', 20),
-       ('Silent Whispers', 'Mystery', 'ADULT', 27.50, '2021-05-15', 'Benjamin Hall', 420, 'Intricate detective work', 'A mystery that keeps you on the edge', 'ENGLISH', 18),
-       ('Whirlwind Romance', 'Romance', 'OTHER', 23.25, '2022-05-15', 'Emma Turner', 360, 'Passionate love affair', 'A romance that sweeps you off your feet', 'ENGLISH', 22);
+-- EMPLOYEE PROFILE
+INSERT INTO employee_profiles (user_id, name, phone, birth_date)
+SELECT id, 'Alice Johnson', '+380991234567', '1990-05-15'
+FROM users WHERE email = 'employee@bookstore.com';
 
--- Extended List (Stock added at the end of each row)
-INSERT INTO BOOKS (name, genre, age_group, price, publication_year, author, number_of_pages, characteristics, description, language, stock)
-VALUES
-    ('Crimson Skies', 'Adventure', 'TEEN', 19.99, '2016-03-12', 'Liam Scott', 310, 'Sky battles', 'A thrilling airborne adventure', 'ENGLISH', 15),
-    ('The Last Kingdom', 'Historical Fiction', 'ADULT', 28.40, '2014-07-21', 'Henry Collins', 520, 'Medieval wars', 'A deep dive into ancient kingdoms', 'ENGLISH', 10),
-    ('Dreamcatcher Nights', 'Fantasy', 'TEEN', 17.80, '2019-11-10', 'Chloe Adams', 360, 'Dream worlds', 'A journey through magical dreams', 'ENGLISH', 25),
-    ('Frozen Echo', 'Thriller', 'ADULT', 25.60, '2020-01-18', 'Noah Brooks', 390, 'Cold case mystery', 'A chilling investigation unfolds', 'ENGLISH', 14),
-    ('Golden Sands', 'Romance', 'ADULT', 22.10, '2018-06-05', 'Ava Mitchell', 300, 'Beach romance', 'Love blossoms under the sun', 'ENGLISH', 30),
-    ('Quantum Drift', 'Science Fiction', 'ADULT', 30.00, '2021-09-09', 'Ethan Price', 410, 'Time travel', 'A paradox threatens reality', 'ENGLISH', 5),
-    ('Hidden Truths', 'Mystery', 'ADULT', 26.75, '2017-02-14', 'Mia Rogers', 380, 'Dark secrets', 'Nothing is as it seems', 'ENGLISH', 20),
-    ('Forest of Illusions', 'Fantasy', 'CHILD', 14.50, '2015-04-22', 'Lucas Green', 250, 'Magical forest', 'A child’s journey through wonder', 'ENGLISH', 40),
-    ('Stormbreaker', 'Adventure', 'TEEN', 18.60, '2013-08-30', 'Jack Turner', 340, 'Ocean voyage', 'Surviving the wild seas', 'ENGLISH', 12),
-    ('Velvet Lies', 'Thriller', 'ADULT', 27.90, '2022-03-03', 'Grace Lee', 420, 'Psychological tension', 'Truth hides behind lies', 'ENGLISH', 18),
-    ('Shattered Realms', 'Fantasy', 'ADULT', 29.99, '2016-12-01', 'Oliver Knight', 500, 'Broken kingdoms', 'War between realms begins', 'ENGLISH', 9),
-    ('Midnight Caller', 'Mystery', 'ADULT', 24.30, '2018-09-19', 'Ella Scott', 370, 'Phone mystery', 'A call that changes everything', 'ENGLISH', 13),
-    ('Neon Future', 'Science Fiction', 'TEEN', 21.50, '2023-01-11', 'Ryan Cole', 350, 'Cyberpunk city', 'Life in a neon dystopia', 'ENGLISH', 28),
-    ('Autumn Letters', 'Romance', 'ADULT', 20.99, '2017-10-05', 'Hannah Bell', 290, 'Letters of love', 'A romance told through time', 'ENGLISH', 35),
-    ('Deep Abyss', 'Thriller', 'ADULT', 28.10, '2019-06-25', 'Nathan Cruz', 410, 'Ocean depths', 'Something lurks below', 'ENGLISH', 7),
-    ('The Young Explorer', 'Adventure', 'CHILD', 13.99, '2012-05-12', 'Sophie Young', 220, 'Exploration', 'A kid discovers the world', 'ENGLISH', 50),
-    ('Forgotten Empire', 'Historical Fiction', 'ADULT', 31.20, '2010-11-11', 'Daniel King', 540, 'Ancient empire', 'Rise and fall of power', 'ENGLISH', 11),
-    ('Silver Moon', 'Fantasy', 'TEEN', 16.75, '2014-03-17', 'Lily Evans', 330, 'Werewolves', 'Secrets under the moonlight', 'ENGLISH', 22),
-    ('Broken Code', 'Science Fiction', 'ADULT', 27.40, '2021-07-07', 'Jason Reed', 390, 'AI uprising', 'Machines take control', 'ENGLISH', 16),
-    ('Chasing Dawn', 'Romance', 'OTHER', 19.60, '2016-02-02', 'Emma Stone', 280, 'Second chances', 'Love finds a way again', 'ENGLISH', 24),
-    ('Iron Fortress', 'Adventure', 'ADULT', 26.00, '2015-09-14', 'George Blake', 410, 'War strategy', 'Defending the last city', 'ENGLISH', 19),
-    ('The Silent Room', 'Mystery', 'ADULT', 25.30, '2018-04-04', 'Zoe Hart', 360, 'Locked room', 'A crime without clues', 'ENGLISH', 14),
-    ('Crystal Path', 'Fantasy', 'CHILD', 12.80, '2013-06-20', 'Anna Frost', 240, 'Magic journey', 'Follow the glowing path', 'ENGLISH', 33),
-    ('Dark Horizon', 'Science Fiction', 'ADULT', 29.50, '2022-08-08', 'Mark Sloan', 430, 'Space mission', 'Journey beyond known space', 'ENGLISH', 10),
-    ('Burning Desire', 'Romance', 'ADULT', 23.10, '2017-01-29', 'Clara West', 310, 'Intense love', 'A story of passion', 'ENGLISH', 21),
-    ('Shadow Hunter', 'Thriller', 'TEEN', 20.40, '2019-12-12', 'Logan Chase', 350, 'Secret agents', 'Hunting in the shadows', 'ENGLISH', 13),
-    ('Ancient Scrolls', 'Historical Fiction', 'ADULT', 32.80, '2011-10-10', 'Victor Hale', 520, 'Lost knowledge', 'Secrets of the past revealed', 'ENGLISH', 6),
-    ('Skyward Bound', 'Adventure', 'TEEN', 17.20, '2014-07-01', 'Aaron Fox', 300, 'Flight dream', 'Chasing the skies', 'ENGLISH', 17),
-    ('Emerald Flame', 'Fantasy', 'ADULT', 28.70, '2016-11-11', 'Diana Prince', 460, 'Dragon fire', 'A battle for survival', 'ENGLISH', 9),
-    ('Codebreaker', 'Science Fiction', 'TEEN', 22.00, '2023-02-20', 'Kevin Hart', 340, 'Encryption war', 'Hackers vs system', 'ENGLISH', 15),
-    ('Lost Melody', 'Romance', 'ADULT', 21.45, '2015-05-05', 'Isla Moore', 290, 'Music love', 'A song brings hearts together', 'ENGLISH', 27),
-    ('The Last Witness', 'Mystery', 'ADULT', 27.10, '2020-03-03', 'Brian Cole', 410, 'Court drama', 'Truth on trial', 'ENGLISH', 12),
-    ('Ocean Secrets', 'Adventure', 'CHILD', 14.20, '2012-08-18', 'Nina Blue', 230, 'Sea life', 'Mysteries of the ocean', 'ENGLISH', 45),
-    ('Firestorm', 'Thriller', 'ADULT', 30.10, '2021-11-11', 'Kyle Storm', 450, 'Explosive action', 'Race against time', 'ENGLISH', 8),
-    ('Winter Rose', 'Romance', 'TEEN', 18.30, '2018-12-24', 'Samantha Ice', 320, 'Winter love', 'A cold season romance', 'ENGLISH', 31),
-    ('Hidden Galaxy', 'Science Fiction', 'ADULT', 31.50, '2019-09-09', 'Oscar Vega', 480, 'Alien worlds', 'Discovery beyond stars', 'ENGLISH', 5),
-    ('Golden Crown', 'Historical Fiction', 'ADULT', 33.00, '2010-01-01', 'Arthur King', 550, 'Royal intrigue', 'Power and betrayal', 'ENGLISH', 10),
-    ('Moonlight Dance', 'Fantasy', 'TEEN', 16.90, '2013-03-03', 'Elena Night', 310, 'Magic dance', 'A mystical performance', 'ENGLISH', 19),
-    ('Silent Storm', 'Thriller', 'ADULT', 28.60, '2022-06-06', 'Peter Snow', 420, 'Covert ops', 'Danger in silence', 'ENGLISH', 14),
-    ('Echo Chamber', 'Science Fiction', 'ADULT', 26.80, '2021-04-14', 'Alan Turington', 370, 'Digital mind', 'Reality vs simulation', 'ENGLISH', 20);
+-- CLIENT PROFILE
+INSERT INTO client_profiles (user_id, name, balance)
+SELECT id, 'Bob Smith', 500.00
+FROM users WHERE email = 'client@bookstore.com';
+
+-- ============================================================
+-- BOOKS (50)
+-- ============================================================
+INSERT INTO books (name, genre, age_group, price, publication_year, author, number_of_pages, stock, characteristics, description, language) VALUES
+                                                                                                                                                ('The Great Gatsby',           'Fiction',         'ADULT', 12.99, '1925-04-10', 'F. Scott Fitzgerald',  180, 25, 'Classic American novel',          'A story of wealth and obsession in the Jazz Age.',                          'ENGLISH'),
+                                                                                                                                                ('To Kill a Mockingbird',      'Fiction',         'TEEN',  14.99, '1960-07-11', 'Harper Lee',           281, 30, 'Pulitzer Prize winner',           'A powerful story of racial injustice in the American South.',               'ENGLISH'),
+                                                                                                                                                ('1984',                       'Dystopia',        'ADULT', 13.99, '1949-06-08', 'George Orwell',        328, 40, 'Political dystopia classic',      'A chilling vision of a totalitarian surveillance state.',                   'ENGLISH'),
+                                                                                                                                                ('Brave New World',            'Dystopia',        'ADULT', 13.49, '1932-01-01', 'Aldous Huxley',        311, 35, 'Philosophical sci-fi',            'A world of pleasure and control without freedom.',                          'ENGLISH'),
+                                                                                                                                                ('Harry Potter and the Sorcerer''s Stone', 'Fantasy', 'CHILD', 16.99, '1997-06-26', 'J.K. Rowling', 309, 50, 'Worldwide bestseller', 'A young boy discovers he is a wizard and enters a magical world.',          'ENGLISH'),
+                                                                                                                                                ('The Hobbit',                 'Fantasy',         'TEEN',  15.99, '1937-09-21', 'J.R.R. Tolkien',       310, 45, 'Epic fantasy classic',            'Bilbo Baggins goes on an unexpected adventure.',                            'ENGLISH'),
+                                                                                                                                                ('The Lord of the Rings',      'Fantasy',         'ADULT', 29.99, '1954-07-29', 'J.R.R. Tolkien',       1178, 20, 'Epic fantasy trilogy',           'The definitive quest to destroy the One Ring.',                             'ENGLISH'),
+                                                                                                                                                ('Pride and Prejudice',        'Romance',         'ADULT', 11.99, '1813-01-28', 'Jane Austen',          432, 28, 'Classic romance',                 'Elizabeth Bennet navigates love and society in Regency England.',           'ENGLISH'),
+                                                                                                                                                ('Jane Eyre',                  'Romance',         'ADULT', 12.49, '1847-10-16', 'Charlotte Brontë',     532, 22, 'Victorian classic',               'An orphaned girl finds love and independence.',                             'ENGLISH'),
+                                                                                                                                                ('Wuthering Heights',          'Romance',         'ADULT', 11.49, '1847-12-01', 'Emily Brontë',         464, 18, 'Gothic romance',                  'A tale of passion and revenge on the Yorkshire moors.',                     'ENGLISH'),
+                                                                                                                                                ('The Catcher in the Rye',     'Fiction',         'TEEN',  13.99, '1951-07-16', 'J.D. Salinger',        277, 33, 'Coming-of-age classic',           'Holden Caulfield wanders New York after expulsion from school.',            'ENGLISH'),
+                                                                                                                                                ('Of Mice and Men',            'Fiction',         'TEEN',  10.99, '1937-02-06', 'John Steinbeck',       112, 27, 'American classic',                'Two migrant workers dream of a better life during the Depression.',         'ENGLISH'),
+                                                                                                                                                ('The Alchemist',              'Philosophy',      'ADULT', 14.99, '1988-01-01', 'Paulo Coelho',         197, 60, 'Inspirational bestseller',        'A shepherd boy travels in search of treasure and his destiny.',             'ENGLISH'),
+                                                                                                                                                ('Don Quixote',                'Adventure',       'ADULT', 18.99, '1605-01-16', 'Miguel de Cervantes',  1072, 15, 'First modern novel',             'A man driven mad by chivalric romances sets off as a knight.',              'SPANISH'),
+                                                                                                                                                ('One Hundred Years of Solitude', 'Magic Realism', 'ADULT', 16.49, '1967-05-30', 'Gabriel García Márquez', 417, 25, 'Nobel Prize masterpiece',   'Seven generations of the Buendía family in the mythical Macondo.',          'SPANISH'),
+                                                                                                                                                ('Crime and Punishment',       'Psychological',   'ADULT', 15.99, '1866-01-01', 'Fyodor Dostoevsky',    671, 20, 'Russian classic',                 'A student commits murder and grapples with guilt.',                         'ENGLISH'),
+                                                                                                                                                ('The Brothers Karamazov',     'Philosophical',   'ADULT', 17.99, '1880-01-01', 'Fyodor Dostoevsky',    796, 15, 'Russian classic',                 'A passionate philosophical novel about faith, doubt, and family.',           'ENGLISH'),
+                                                                                                                                                ('War and Peace',              'Historical',      'ADULT', 22.99, '1869-01-01', 'Leo Tolstoy',          1392, 10, 'Epic historical novel',          'Russian society during the Napoleonic Wars.',                               'ENGLISH'),
+                                                                                                                                                ('Anna Karenina',              'Romance',         'ADULT', 16.99, '1878-01-01', 'Leo Tolstoy',          964, 18, 'Russian classic',                 'A married aristocrat falls into a tragic love affair.',                     'ENGLISH'),
+                                                                                                                                                ('The Little Prince',          'Fantasy',         'CHILD', 9.99,  '1943-04-06', 'Antoine de Saint-Exupéry', 96, 70, 'Beloved children''s tale',   'A pilot stranded in the desert meets a little prince from another planet.', 'FRENCH'),
+                                                                                                                                                ('Les Misérables',             'Historical',      'ADULT', 19.99, '1862-01-01', 'Victor Hugo',          1463, 12, 'French classic',                  'The struggles of ex-convict Jean Valjean in 19th century France.',          'FRENCH'),
+                                                                                                                                                ('The Count of Monte Cristo',  'Adventure',       'ADULT', 20.99, '1844-01-01', 'Alexandre Dumas',      1276, 14, 'Classic adventure',               'A wrongly imprisoned man escapes and plots his revenge.',                   'FRENCH'),
+                                                                                                                                                ('Faust',                      'Drama',           'ADULT', 14.49, '1808-01-01', 'Johann Wolfgang von Goethe', 512, 10, 'German literary classic',  'A scholar sells his soul to the devil in pursuit of knowledge.',            'GERMAN'),
+                                                                                                                                                ('The Trial',                  'Philosophical',   'ADULT', 13.49, '1925-01-01', 'Franz Kafka',          255, 22, 'Absurdist classic',               'A man is arrested and prosecuted by an inaccessible authority.',            'GERMAN'),
+                                                                                                                                                ('Kafka on the Shore',         'Magic Realism',   'ADULT', 15.99, '2002-09-12', 'Haruki Murakami',      505, 30, 'Japanese contemporary',           'Two parallel stories weave through surreal events in Japan.',               'JAPANESE'),
+                                                                                                                                                ('Norwegian Wood',             'Romance',         'ADULT', 14.49, '1987-09-04', 'Haruki Murakami',      296, 35, 'Japanese romance',                'A nostalgic story of love and loss in 1960s Tokyo.',                        'JAPANESE'),
+                                                                                                                                                ('Kokoro',                     'Psychological',   'ADULT', 12.99, '1914-01-01', 'Natsume Soseki',       248, 16, 'Japanese classic',                'An exploration of loneliness and the Meiji era in Japan.',                  'JAPANESE'),
+                                                                                                                                                ('Kobzar',                     'Poetry',          'ADULT', 11.99, '1840-01-01', 'Taras Shevchenko',     304, 40, 'Ukrainian literary treasure',     'The foundational poetry collection of Ukrainian literature.',               'UKRAINIAN'),
+                                                                                                                                                ('Tini zabutykh predkiv',      'Historical',      'TEEN',  10.99, '1911-01-01', 'Mykhailo Kotsiubynsky', 128, 25, 'Ukrainian classic',             'A tragic love story set in the Carpathian mountains.',                      'UKRAINIAN'),
+                                                                                                                                                ('Lisova pisnia',              'Drama',           'TEEN',  10.49, '1911-01-25', 'Lesia Ukrainka',       112, 22, 'Ukrainian dramatic poem',         'A poetic drama blending folklore and mythology.',                           'UKRAINIAN'),
+                                                                                                                                                ('Dune',                       'Sci-Fi',          'ADULT', 17.99, '1965-08-01', 'Frank Herbert',        688, 38, 'Epic science fiction',            'A desert planet holds the universe''s most precious resource.',             'ENGLISH'),
+                                                                                                                                                ('Foundation',                 'Sci-Fi',          'ADULT', 15.99, '1951-05-01', 'Isaac Asimov',         255, 30, 'Classic sci-fi',                  'A mathematician predicts the fall of civilization and plans its recovery.', 'ENGLISH'),
+                                                                                                                                                ('Ender''s Game',              'Sci-Fi',          'TEEN',  14.99, '1985-01-15', 'Orson Scott Card',     352, 32, 'Military sci-fi',                 'A child prodigy is trained to fight an alien war.',                         'ENGLISH'),
+                                                                                                                                                ('The Hitchhiker''s Guide to the Galaxy', 'Sci-Fi', 'ADULT', 13.99, '1979-10-12', 'Douglas Adams',     193, 45, 'Comic sci-fi classic',            'An ordinary man is swept across the galaxy after Earth is demolished.',     'ENGLISH'),
+                                                                                                                                                ('Neuromancer',                'Sci-Fi',          'ADULT', 14.49, '1984-07-01', 'William Gibson',       271, 20, 'Cyberpunk classic',               'A washed-up hacker is hired for one last job in cyberspace.',               'ENGLISH'),
+                                                                                                                                                ('The Road',                   'Post-Apocalyptic','ADULT', 13.99, '2006-09-26', 'Cormac McCarthy',      287, 25, 'Pulitzer Prize winner',           'A father and son journey through a post-apocalyptic America.',              'ENGLISH'),
+                                                                                                                                                ('No Country for Old Men',     'Thriller',        'ADULT', 13.49, '2005-07-19', 'Cormac McCarthy',      309, 20, 'Neo-Western thriller',            'A hunter stumbles upon drug money and a relentless killer.',                'ENGLISH'),
+                                                                                                                                                ('Gone Girl',                  'Thriller',        'ADULT', 14.99, '2012-06-05', 'Gillian Flynn',        422, 35, 'Psychological thriller',          'A woman disappears on her anniversary — and nothing is as it seems.',       'ENGLISH'),
+                                                                                                                                                ('The Girl with the Dragon Tattoo', 'Mystery',   'ADULT', 15.49, '2005-08-01', 'Stieg Larsson',        672, 28, 'Nordic noir',                     'A journalist and hacker investigate a decades-old disappearance.',          'ENGLISH'),
+                                                                                                                                                ('Sherlock Holmes: Complete',  'Mystery',         'ADULT', 19.99, '1892-10-14', 'Arthur Conan Doyle',   1122, 20, 'Classic detective fiction',      'The complete adventures of the world''s greatest detective.',               'ENGLISH'),
+                                                                                                                                                ('And Then There Were None',   'Mystery',         'ADULT', 12.99, '1939-11-06', 'Agatha Christie',      264, 40, 'Best-selling mystery',            'Ten strangers are lured to an island — and begin to die one by one.',       'ENGLISH'),
+                                                                                                                                                ('The Da Vinci Code',          'Thriller',        'ADULT', 14.99, '2003-03-18', 'Dan Brown',            689, 42, 'Mystery thriller',                'A symbologist uncovers a religious conspiracy hidden for centuries.',        'ENGLISH'),
+                                                                                                                                                ('Sapiens',                    'Non-Fiction',     'ADULT', 18.99, '2011-01-01', 'Yuval Noah Harari',    443, 50, 'History of humankind',            'A sweeping history of the human species from Stone Age to present.',        'ENGLISH'),
+                                                                                                                                                ('Homo Deus',                  'Non-Fiction',     'ADULT', 17.99, '2015-09-04', 'Yuval Noah Harari',    450, 35, 'Future of humanity',              'What will become of humanity in the age of algorithms and biotech?',        'ENGLISH'),
+                                                                                                                                                ('Atomic Habits',              'Self-Help',       'ADULT', 16.99, '2018-10-16', 'James Clear',          320, 55, 'Practical self-improvement',      'Tiny changes that lead to remarkable results.',                             'ENGLISH'),
+                                                                                                                                                ('The Power of Habit',         'Self-Help',       'ADULT', 15.99, '2012-02-28', 'Charles Duhigg',       371, 40, 'Habit science',                   'Why we do what we do in life and business.',                               'ENGLISH'),
+                                                                                                                                                ('Thinking, Fast and Slow',    'Psychology',      'ADULT', 17.49, '2011-10-25', 'Daniel Kahneman',      499, 30, 'Behavioral economics',            'How two systems of thinking shape our judgments and decisions.',            'ENGLISH'),
+                                                                                                                                                ('The Subtle Art of Not Giving a F*ck', 'Self-Help', 'ADULT', 15.99, '2016-09-13', 'Mark Manson',      224, 48, 'Counterintuitive self-help',      'A refreshing antidote to the cult of positivity.',                          'ENGLISH'),
+                                                                                                                                                ('Charlotte''s Web',           'Fiction',         'CHILD', 8.99,  '1952-10-15', 'E.B. White',           184, 60, 'Beloved children''s classic',     'A spider saves her friend Wilbur the pig from slaughter.',                  'ENGLISH'),
+                                                                                                                                                ('The Lion, the Witch and the Wardrobe', 'Fantasy', 'CHILD', 10.99, '1950-10-16', 'C.S. Lewis',        208, 55, 'Classic fantasy for children',    'Four children discover a magical world through a wardrobe.',                'ENGLISH');

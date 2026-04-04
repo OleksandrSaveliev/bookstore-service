@@ -5,16 +5,17 @@ import com.my.bookstore.dto.LoginRequestDTO;
 import com.my.bookstore.dto.SignupRequestDTO;
 import com.my.bookstore.exception.AlreadyExistException;
 import com.my.bookstore.exception.NotFoundException;
-import com.my.bookstore.model.Client;
-import com.my.bookstore.repo.ClientRepository;
+import com.my.bookstore.model.ClientProfile;
+import com.my.bookstore.model.User;
+import com.my.bookstore.model.enums.Role;
+import com.my.bookstore.repo.ClientProfileRepository;
+import com.my.bookstore.repo.UserRepository;
 import com.my.bookstore.security.JwtUtils;
 import com.my.bookstore.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +25,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,8 +37,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
-    private final ClientRepository clientRepository;
-    private final ModelMapper modelMapper;
+    private final UserRepository userRepository;
+    private final ClientProfileRepository clientProfileRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.cookie.secure}")
@@ -59,31 +61,38 @@ public class AuthServiceImpl implements AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        Client client = clientRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new NotFoundException("Client not found: " + request.getEmail()));
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new NotFoundException("User not found: " + request.getEmail()));
 
-        return new AuthResponseDTO(client.getId(), client.getEmail(), roles);
+        return new AuthResponseDTO(user.getId(), user.getEmail(), roles);
     }
 
     @Override
+    @Transactional
     public AuthResponseDTO signup(SignupRequestDTO request, HttpServletResponse response) {
-        if (clientRepository.existsByEmail(request.getEmail())) {
-            throw new AlreadyExistException("Client already exists: " + request.getEmail());
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new AlreadyExistException("Email already in use: " + request.getEmail());
         }
 
-        Client client = modelMapper.map(request, Client.class);
-        client.setPassword(passwordEncoder.encode(request.getPassword()));
-        client.setBalance(BigDecimal.ZERO);
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(Role.CLIENT);
+        User savedUser = userRepository.save(user);
 
-        Client saved = clientRepository.save(client);
-        addJwtCookie(response, jwtUtils.generateToken(saved.getEmail()));
+        ClientProfile profile = new ClientProfile();
+        profile.setUser(savedUser);
+        profile.setName(request.getName());
+        profile.setBalance(BigDecimal.ZERO);
+        clientProfileRepository.save(profile);
 
-        return new AuthResponseDTO(saved.getId(), saved.getEmail(), List.of("ROLE_CLIENT"));
+        addJwtCookie(response, jwtUtils.generateToken(savedUser.getEmail()));
+
+        return new AuthResponseDTO(savedUser.getId(), savedUser.getEmail(), List.of("ROLE_CLIENT"));
     }
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-
         ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, "")
                 .httpOnly(true)
                 .secure(cookieSecure)
@@ -91,14 +100,11 @@ public class AuthServiceImpl implements AuthService {
                 .maxAge(0)
                 .sameSite("Strict")
                 .build();
-
         response.addHeader("Set-Cookie", cookie.toString());
-
         SecurityContextHolder.clearContext();
     }
 
     private void addJwtCookie(HttpServletResponse response, String token) {
-
         ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, token)
                 .httpOnly(true)
                 .secure(cookieSecure)
@@ -106,7 +112,6 @@ public class AuthServiceImpl implements AuthService {
                 .maxAge(COOKIE_MAX_AGE)
                 .sameSite("Lax")
                 .build();
-
         response.addHeader("Set-Cookie", cookie.toString());
     }
 }

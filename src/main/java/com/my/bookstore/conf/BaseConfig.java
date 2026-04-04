@@ -1,6 +1,9 @@
 package com.my.bookstore.conf;
 
+import com.my.bookstore.dto.OrderResponseDTO;
+import com.my.bookstore.model.Order;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
@@ -15,9 +18,16 @@ import java.util.Locale;
 
 @Configuration
 public class BaseConfig implements WebMvcConfigurer {
+
     @Bean
     public ModelMapper modelMapper() {
-        return new ModelMapper();
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+
+        modelMapper.typeMap(Order.class, OrderResponseDTO.class)
+                .addMapping(src -> src.getClient().getUser().getId(), OrderResponseDTO::setClientId);
+
+        return modelMapper;
     }
 
     @Bean

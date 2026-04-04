@@ -1,6 +1,5 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.model.Employee;
 import com.my.bookstore.model.User;
 import com.my.bookstore.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +17,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-
-        String role = user instanceof Employee ? "EMPLOYEE" : "CLIENT";
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
                 .password(user.getPassword())
-                .roles(role)
+                .roles(user.getRole().name())
                 .build();
     }
 }
