@@ -1,22 +1,22 @@
 package com.my.bookstore.service;
 
 import com.my.bookstore.dto.ClientDTO;
+import com.my.bookstore.dto.ClientPatchDTO;
+import com.my.bookstore.dto.ClientResponseDTO;
 import com.my.bookstore.dto.SignupRequestDTO;
 
 import java.util.List;
 
 public interface ClientService {
 
-    List<ClientDTO> getAllClients();
+    List<ClientResponseDTO> getAllClients();
 
-    ClientDTO getClientById(Long id);
-
-    ClientDTO updateClientById(Long id, ClientDTO client);
+    ClientResponseDTO getClientById(Long id);
 
     void deleteClientById(Long id);
 
     ClientDTO addClient(ClientDTO client);
 
-    ClientDTO registerClient(SignupRequestDTO signupRequest);
+    ClientResponseDTO patchClientById(Long id, ClientPatchDTO patchDTO);
 
 }

@@ -1,8 +1,6 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.AuthResponseDTO;
-import com.my.bookstore.dto.ClientDTO;
-import com.my.bookstore.dto.SignupRequestDTO;
+import com.my.bookstore.dto.*;
 import com.my.bookstore.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +18,12 @@ public class ClientController {
     private final ClientService clientService;
 
     @GetMapping
-    public ResponseEntity<List<ClientDTO>> getAllClients() {
+    public ResponseEntity<List<ClientResponseDTO>> getAllClients() {
         return ResponseEntity.ok(clientService.getAllClients());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClientDTO> getClientById(@PathVariable Long id) {
+    public ResponseEntity<ClientResponseDTO> getClientById(@PathVariable Long id) {
         return ResponseEntity.ok(clientService.getClientById(id));
     }
 
@@ -34,11 +32,17 @@ public class ClientController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(clientService.addClient(clientDTO));
     }
+//
+//    @PutMapping("/{id}")
+//    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id,
+//                                                  @Valid @RequestBody ClientDTO clientDTO) {
+//        return ResponseEntity.ok(clientService.updateClientById(id, clientDTO));
+//    }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id,
-                                                  @Valid @RequestBody ClientDTO clientDTO) {
-        return ResponseEntity.ok(clientService.updateClientById(id, clientDTO));
+    @PatchMapping("/{id}")
+    public ResponseEntity<ClientResponseDTO> patchClient(@PathVariable Long id,
+                                                         @Valid @RequestBody ClientPatchDTO patchDTO) {
+        return ResponseEntity.ok(clientService.patchClientById(id, patchDTO));
     }
 
     @DeleteMapping("/{id}")

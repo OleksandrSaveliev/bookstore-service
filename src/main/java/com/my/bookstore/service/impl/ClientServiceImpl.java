@@ -1,7 +1,8 @@
 package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.ClientDTO;
-import com.my.bookstore.dto.SignupRequestDTO;
+import com.my.bookstore.dto.ClientPatchDTO;
+import com.my.bookstore.dto.ClientResponseDTO;
 import com.my.bookstore.exception.AlreadyExistException;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.Client;
@@ -13,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -25,30 +25,17 @@ public class ClientServiceImpl implements ClientService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public List<ClientDTO> getAllClients() {
+    public List<ClientResponseDTO> getAllClients() {
         return clientRepository.findAll().stream()
-                .map(client -> modelMapper.map(client, ClientDTO.class))
+                .map(client -> modelMapper.map(client, ClientResponseDTO.class))
                 .toList();
     }
 
     @Override
-    public ClientDTO getClientById(Long id) {
+    public ClientResponseDTO getClientById(Long id) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Client not found: " + id));
-        return modelMapper.map(client, ClientDTO.class);
-    }
-
-    @Override
-    @Transactional
-    public ClientDTO updateClientById(Long id, ClientDTO clientDTO) {
-        Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Client not found: " + id));
-        modelMapper.map(clientDTO, client);
-        client.setId(id);
-        if (clientDTO.getPassword() != null && !clientDTO.getPassword().isEmpty()) {
-            client.setPassword(passwordEncoder.encode(clientDTO.getPassword()));
-        }
-        return modelMapper.map(clientRepository.save(client), ClientDTO.class);
+        return modelMapper.map(client, ClientResponseDTO.class);
     }
 
     @Override
@@ -72,19 +59,23 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDTO registerClient(SignupRequestDTO signupRequest) {
+    public ClientResponseDTO patchClientById(Long id, ClientPatchDTO patchDTO) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Client not found: " + id));
 
-        if (clientRepository.existsByEmail(signupRequest.getEmail())) {
-            throw new AlreadyExistException("Email already in use: " + signupRequest.getEmail());
+        if (patchDTO.getEmail() != null && !patchDTO.getEmail().isBlank()) {
+            client.setEmail(patchDTO.getEmail());
+        }
+        if (patchDTO.getName() != null && !patchDTO.getName().isBlank()) {
+            client.setName(patchDTO.getName());
+        }
+        if (patchDTO.getPassword() != null && !patchDTO.getPassword().isBlank()) {
+            client.setPassword(passwordEncoder.encode(patchDTO.getPassword()));
+        }
+        if (patchDTO.getBalance() != null) {
+            client.setBalance(patchDTO.getBalance());
         }
 
-        Client client = new Client();
-        client.setName(signupRequest.getName());
-        client.setEmail(signupRequest.getEmail());
-        client.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
-
-        client.setBalance(BigDecimal.ZERO);
-
-        return modelMapper.map(clientRepository.save(client), ClientDTO.class);
+        return modelMapper.map(clientRepository.save(client), ClientResponseDTO.class);
     }
 }

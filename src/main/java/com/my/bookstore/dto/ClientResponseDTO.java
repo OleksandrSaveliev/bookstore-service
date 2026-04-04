@@ -1,18 +1,16 @@
 package com.my.bookstore.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.math.BigDecimal;
 
-import java.util.List;
-
-@Setter
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
-public class AuthResponseDTO {
+public class ClientResponseDTO {
     private Long id;
     private String email;
-    private List<String> roles;
+    private String name;
+    private BigDecimal balance;
 }
