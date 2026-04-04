@@ -1,0 +1,15 @@
+services:
+  mysqldb:
+    image: mysql:8.0.45-debian
+    container_name: bookstore-mysql
+    restart: always
+    environment:
+      - MYSQL_DATABASE=bookstore_db
+      - MYSQL_ROOT_PASSWORD=rootpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
