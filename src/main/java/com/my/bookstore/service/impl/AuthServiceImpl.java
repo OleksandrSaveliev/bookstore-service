@@ -46,38 +46,27 @@ public class AuthServiceImpl implements AuthService {
     private static final int COOKIE_MAX_AGE = 24 * 60 * 60;
 
     @Override
-    public AuthResponseDTO login(@Valid LoginRequestDTO request, HttpServletResponse response) {
-
+    public AuthResponseDTO login(LoginRequestDTO request, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String token = jwtUtils.generateToken(authentication.getName());
+        addJwtCookie(response, jwtUtils.generateToken(authentication.getName()));
 
         List<String> roles = authentication.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        addJwtCookie(response, token);
-
         Client client = clientRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new NotFoundException("Client not found: " + request.getEmail()));
 
-        AuthResponseDTO authResponse = modelMapper.map(client, AuthResponseDTO.class);
-        authResponse.setRoles(roles);
-
-        return authResponse;
+        return new AuthResponseDTO(client.getId(), client.getEmail(), roles);
     }
 
     @Override
-    public AuthResponseDTO signup(@Valid SignupRequestDTO request, HttpServletResponse response) {
-
+    public AuthResponseDTO signup(SignupRequestDTO request, HttpServletResponse response) {
         if (clientRepository.existsByEmail(request.getEmail())) {
             throw new AlreadyExistException("Client already exists: " + request.getEmail());
         }
@@ -87,11 +76,9 @@ public class AuthServiceImpl implements AuthService {
         client.setBalance(BigDecimal.ZERO);
 
         Client saved = clientRepository.save(client);
-        String token = jwtUtils.generateToken(saved.getEmail());
+        addJwtCookie(response, jwtUtils.generateToken(saved.getEmail()));
 
-        addJwtCookie(response, token);
-
-        return modelMapper.map(saved, AuthResponseDTO.class);
+        return new AuthResponseDTO(saved.getId(), saved.getEmail(), List.of("ROLE_CLIENT"));
     }
 
     @Override
