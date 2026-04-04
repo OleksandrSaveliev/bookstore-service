@@ -1,12 +1,12 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.ClientDTO;
 import com.my.bookstore.dto.ClientPatchDTO;
 import com.my.bookstore.dto.ClientResponseDTO;
 import com.my.bookstore.exception.AlreadyExistException;
 import com.my.bookstore.exception.NotFoundException;
-import com.my.bookstore.model.Client;
-import com.my.bookstore.repo.ClientRepository;
+import com.my.bookstore.model.ClientProfile;
+import com.my.bookstore.repo.ClientProfileRepository;
+import com.my.bookstore.repo.UserRepository;
 import com.my.bookstore.service.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,62 +20,66 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
-    private final ClientRepository clientRepository;
+    private final ClientProfileRepository clientProfileRepository;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<ClientResponseDTO> getAllClients() {
-        return clientRepository.findAll().stream()
-                .map(client -> modelMapper.map(client, ClientResponseDTO.class))
+        return clientProfileRepository.findAll().stream()
+                .map(this::toResponseDTO)
                 .toList();
     }
 
     @Override
     public ClientResponseDTO getClientById(Long id) {
-        Client client = clientRepository.findById(id)
+        ClientProfile profile = clientProfileRepository.findByUserId(id)
                 .orElseThrow(() -> new NotFoundException("Client not found: " + id));
-        return modelMapper.map(client, ClientResponseDTO.class);
+        return toResponseDTO(profile);
     }
 
     @Override
     @Transactional
     public void deleteClientById(Long id) {
-        Client client = clientRepository.findById(id)
+        ClientProfile profile = clientProfileRepository.findByUserId(id)
                 .orElseThrow(() -> new NotFoundException("Client not found: " + id));
-        clientRepository.delete(client);
-    }
-
-    @Override
-    @Transactional
-    public ClientDTO addClient(ClientDTO clientDTO) {
-        if (clientRepository.existsByEmail(clientDTO.getEmail())) {
-            throw new AlreadyExistException("Client already exists: " + clientDTO.getEmail());
-        }
-        Client client = modelMapper.map(clientDTO, Client.class);
-        client.setPassword(passwordEncoder.encode(clientDTO.getPassword()));
-        return modelMapper.map(clientRepository.save(client), ClientDTO.class);
+        clientProfileRepository.delete(profile);
+        userRepository.deleteById(id);
     }
 
     @Override
     @Transactional
     public ClientResponseDTO patchClientById(Long id, ClientPatchDTO patchDTO) {
-        Client client = clientRepository.findById(id)
+        ClientProfile profile = clientProfileRepository.findByUserId(id)
                 .orElseThrow(() -> new NotFoundException("Client not found: " + id));
 
-        if (patchDTO.getEmail() != null && !patchDTO.getEmail().isBlank()) {
-            client.setEmail(patchDTO.getEmail());
-        }
         if (patchDTO.getName() != null && !patchDTO.getName().isBlank()) {
-            client.setName(patchDTO.getName());
-        }
-        if (patchDTO.getPassword() != null && !patchDTO.getPassword().isBlank()) {
-            client.setPassword(passwordEncoder.encode(patchDTO.getPassword()));
+            profile.setName(patchDTO.getName());
         }
         if (patchDTO.getBalance() != null) {
-            client.setBalance(patchDTO.getBalance());
+            profile.setBalance(patchDTO.getBalance());
+        }
+        if (patchDTO.getEmail() != null && !patchDTO.getEmail().isBlank() ) {
+            if (!profile.getUser().getEmail().equals(patchDTO.getEmail()) && userRepository.existsByEmail(patchDTO.getEmail())) {
+                throw new AlreadyExistException("Email already in use: " + patchDTO.getEmail());
+            }
+            profile.getUser().setEmail(patchDTO.getEmail());
+        }
+        if (patchDTO.getPassword() != null && !patchDTO.getPassword().isBlank()) {
+            profile.getUser().setPassword(passwordEncoder.encode(patchDTO.getPassword()));
         }
 
-        return modelMapper.map(clientRepository.save(client), ClientResponseDTO.class);
+        clientProfileRepository.save(profile);
+        return toResponseDTO(profile);
+    }
+
+    private ClientResponseDTO toResponseDTO(ClientProfile profile) {
+        ClientResponseDTO dto = new ClientResponseDTO();
+        dto.setId(profile.getUser().getId());
+        dto.setEmail(profile.getUser().getEmail());
+        dto.setName(profile.getName());
+        dto.setBalance(profile.getBalance());
+        return dto;
     }
 }

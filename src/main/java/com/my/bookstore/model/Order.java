@@ -20,11 +20,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "client_id")
-    private Client client;
-
-    @ManyToOne
-    @JoinColumn(name = "employee_id")
-    private Employee employee;
+    private ClientProfile client;
 
     @Column(name = "order_date")
     private LocalDateTime orderDate;

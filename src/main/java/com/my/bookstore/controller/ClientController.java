@@ -1,10 +1,10 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.*;
+import com.my.bookstore.dto.ClientPatchDTO;
+import com.my.bookstore.dto.ClientResponseDTO;
 import com.my.bookstore.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,18 +26,6 @@ public class ClientController {
     public ResponseEntity<ClientResponseDTO> getClientById(@PathVariable Long id) {
         return ResponseEntity.ok(clientService.getClientById(id));
     }
-
-    @PostMapping
-    public ResponseEntity<ClientDTO> addClient(@Valid @RequestBody ClientDTO clientDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(clientService.addClient(clientDTO));
-    }
-//
-//    @PutMapping("/{id}")
-//    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id,
-//                                                  @Valid @RequestBody ClientDTO clientDTO) {
-//        return ResponseEntity.ok(clientService.updateClientById(id, clientDTO));
-//    }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ClientResponseDTO> patchClient(@PathVariable Long id,

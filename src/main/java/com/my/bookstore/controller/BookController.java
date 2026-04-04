@@ -20,11 +20,6 @@ public class BookController {
 
     private final BookService bookService;
 
-//    @GetMapping
-//    public ResponseEntity<List<BookDTO>> getAllBooks() {
-//        return ResponseEntity.ok(bookService.getAllBooks());
-//    }
-
     @GetMapping
     public Page<BookDTO> getBooks(
             @RequestParam(defaultValue = "0") int page,

@@ -1,28 +1,28 @@
 package com.my.bookstore.model;
 
-import com.my.bookstore.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "client_profiles")
+public class ClientProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true, nullable = false)
+    private User user;
 
     @Column(nullable = false)
-    private String password;
+    private String name;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private BigDecimal balance;
 }

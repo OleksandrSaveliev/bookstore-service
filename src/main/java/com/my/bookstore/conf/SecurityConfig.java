@@ -51,9 +51,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5173"));
-
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
-
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -65,35 +63,41 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors
-                        .configurationSource(corsConfigurationSource()))
-
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
-
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
                 .exceptionHandling(exception ->
                         exception.authenticationEntryPoint(unauthorizedHandler))
-
-
                 .authorizeHttpRequests(auth -> auth
+
+                        // public
                         .requestMatchers(
                                 "/",
                                 "/api/v1/auth/**",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
-                                "/h2-console/**")
-                        .permitAll()
+                                "/h2-console/**"
+                        ).permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/v1/books/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/books/**").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/books/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/books/**").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/books/**").hasRole("EMPLOYEE")
+
                         .requestMatchers("/api/v1/employees/**").hasRole("EMPLOYEE")
-                        .requestMatchers("/api/v1/clients/**").hasAnyRole("EMPLOYEE", "CLIENT")
-                        .requestMatchers("/api/v1/orders/**").authenticated()
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/clients/**").hasAnyRole("EMPLOYEE", "CLIENT")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/clients/**").hasAnyRole("EMPLOYEE", "CLIENT")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/clients/**").hasRole("EMPLOYEE")
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyRole("EMPLOYEE", "CLIENT")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/orders/**").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/orders/**").hasRole("EMPLOYEE")
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable);
