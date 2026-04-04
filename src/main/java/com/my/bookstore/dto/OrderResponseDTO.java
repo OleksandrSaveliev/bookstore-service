@@ -1,0 +1,19 @@
+package com.my.bookstore.dto;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class OrderResponseDTO {
+    private Long id;
+    private Long clientId;
+    private LocalDateTime orderDate;
+    private BigDecimal price;
+    private List<BookItemDTO> bookItems;
+}

@@ -1,7 +1,7 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.OrderDTO;
 import com.my.bookstore.dto.OrderRequestDTO;
+import com.my.bookstore.dto.OrderResponseDTO;
 import com.my.bookstore.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public Page<OrderDTO> getOrders(
+    public Page<OrderResponseDTO> getOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -30,22 +30,17 @@ public class OrderController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+    public ResponseEntity<List<OrderResponseDTO>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
 
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<List<OrderDTO>> getOrdersByClient(@PathVariable Long clientId) {
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByClient(@PathVariable Long clientId) {
         return ResponseEntity.ok(orderService.getOrdersByClientId(clientId));
     }
 
-    @GetMapping("/employee/{employeeId}")
-    public ResponseEntity<List<OrderDTO>> getOrdersByEmployee(@PathVariable Long employeeId) {
-        return ResponseEntity.ok(orderService.getOrdersByEmployeeId(employeeId));
-    }
-
     @PostMapping
-    public ResponseEntity<OrderDTO> addOrder(@Valid @RequestBody OrderRequestDTO requestDTO) {
+    public ResponseEntity<OrderResponseDTO> addOrder(@Valid @RequestBody OrderRequestDTO requestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(orderService.addOrder(requestDTO));
     }

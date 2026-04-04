@@ -22,10 +22,6 @@ public class Order {
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @ManyToOne
-    @JoinColumn(name = "employee_id")
-    private Employee employee;
-
     @Column(name = "order_date")
     private LocalDateTime orderDate;
 
