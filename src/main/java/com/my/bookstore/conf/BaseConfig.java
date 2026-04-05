@@ -1,6 +1,7 @@
 package com.my.bookstore.conf;
 
 import com.my.bookstore.dto.BookItemDTO;
+import com.my.bookstore.dto.BookItemResponseDTO;
 import com.my.bookstore.dto.EmployeeResponseDTO;
 import com.my.bookstore.dto.OrderResponseDTO;
 import com.my.bookstore.model.BookItem;
@@ -38,6 +39,10 @@ public class BaseConfig implements WebMvcConfigurer {
             m.map(src -> src.getUser().getEmail(), EmployeeResponseDTO::setEmail);
             m.map(src -> src.getUser().getId(), EmployeeResponseDTO::setId);
         });
+
+        modelMapper.typeMap(BookItem.class, BookItemResponseDTO.class)
+                .addMapping(src -> src.getBook().getId(), BookItemResponseDTO::setBookId)
+                .addMapping(src -> src.getBook().getName(), BookItemResponseDTO::setBookName);
 
         return modelMapper;
     }

@@ -18,5 +18,5 @@ public class OrderResponseDTO {
     private LocalDateTime updatedAt;
     private BigDecimal price;
     private OrderStatus status;
-    private List<BookItemDTO> bookItems;
+    private List<BookItemResponseDTO> bookItems;
 }

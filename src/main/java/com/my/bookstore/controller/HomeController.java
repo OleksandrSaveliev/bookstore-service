@@ -1,6 +1,6 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.BookDTO;
+import com.my.bookstore.dto.BookResponseDTO;
 import com.my.bookstore.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,8 +25,7 @@ public class HomeController {
             Model model
     ) {
 
-        Page<BookDTO> booksPage = bookService.getBooks(page, size, "id", "asc");
-
+        Page<BookResponseDTO> booksPage = bookService.getBooks(page, size, "id", "asc", null, null, null, null);
         model.addAttribute("books", booksPage.getContent());
         model.addAttribute("currentPage", booksPage.getNumber());
         model.addAttribute("totalPages", booksPage.getTotalPages());

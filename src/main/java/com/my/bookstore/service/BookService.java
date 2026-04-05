@@ -1,21 +1,17 @@
 package com.my.bookstore.service;
 
-import com.my.bookstore.dto.BookDTO;
+import com.my.bookstore.dto.BookPatchDTO;
+import com.my.bookstore.dto.BookRequestDTO;
+import com.my.bookstore.dto.BookResponseDTO;
+import com.my.bookstore.model.enums.AgeGroup;
+import com.my.bookstore.model.enums.Language;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 public interface BookService {
-
-    List<BookDTO> getAllBooks();
-
-    BookDTO getBookById(Long id);
-
-    BookDTO updateBookById(Long id, BookDTO book);
-
+    Page<BookResponseDTO> getBooks(int page, int size, String sortBy, String sortDir,
+                                   String search, String genre, AgeGroup ageGroup, Language language);
+    BookResponseDTO getBookById(Long id);
+    BookResponseDTO addBook(BookRequestDTO requestDTO);
+    BookResponseDTO patchBookById(Long id, BookPatchDTO patchDTO);
     void deleteBookById(Long id);
-
-    BookDTO addBook(BookDTO book);
-
-    Page<BookDTO> getBooks(int page, int size, String sortBy, String sortDir);
 }
