@@ -7,12 +7,14 @@ import com.my.bookstore.exception.LowBalanceException;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.exception.OutOfStockException;
 import com.my.bookstore.model.*;
+import com.my.bookstore.model.enums.OrderStatus;
 import com.my.bookstore.repo.BookRepository;
 import com.my.bookstore.repo.ClientProfileRepository;
 import com.my.bookstore.repo.OrderRepository;
 import com.my.bookstore.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -69,7 +71,6 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order();
         order.setClient(client);
-        order.setOrderDate(LocalDateTime.now());
 
         List<Long> bookIds = requestDTO.getItems().stream()
                 .map(OrderItemRequestDTO::getBookId)
@@ -113,5 +114,45 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = orderRepository.save(order);
 
         return modelMapper.map(savedOrder, OrderResponseDTO.class);
+    }
+
+    @Override
+    @Transactional
+    public OrderResponseDTO updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalStateException("Cannot update an order that is already " + order.getStatus());
+        }
+
+        order.setStatus(newStatus);
+        Order updatedOrder = orderRepository.save(order);
+
+        return modelMapper.map(updatedOrder, OrderResponseDTO.class);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderResponseDTO> getAllOrders(int page, int size, String sortBy, String direction, String search) {
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        if (search == null || search.trim().isEmpty()) {
+            return orderRepository.findAll(pageable)
+                    .map(order -> modelMapper.map(order, OrderResponseDTO.class));
+        }
+
+        try {
+            Long userId = Long.parseLong(search.trim());
+            Page<Order> orderPage = orderRepository.findAllByClientUserId(userId, pageable);
+            return orderPage.map(order -> modelMapper.map(order, OrderResponseDTO.class));
+        } catch (NumberFormatException e) {
+            throw new NotFoundException("Invalid Search ID: " + search);
+        }
     }
 }
