@@ -1,5 +1,6 @@
 package com.my.bookstore.model;
 
+import com.my.bookstore.model.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -26,6 +27,10 @@ public class Order {
     private LocalDateTime orderDate;
 
     private BigDecimal price;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private OrderStatus status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookItem> bookItems;

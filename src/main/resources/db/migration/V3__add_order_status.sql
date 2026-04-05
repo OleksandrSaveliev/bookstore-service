@@ -1,0 +1,6 @@
+ALTER TABLE orders
+    ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'PENDING';
+
+ALTER TABLE orders
+    ADD CONSTRAINT chk_order_status
+        CHECK (status IN ('PENDING', 'COMPLETED', 'CANCELLED'));

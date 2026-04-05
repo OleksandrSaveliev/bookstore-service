@@ -1,5 +1,6 @@
 package com.my.bookstore.dto;
 
+import com.my.bookstore.model.enums.OrderStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,5 +16,6 @@ public class OrderResponseDTO {
     private Long clientId;
     private LocalDateTime orderDate;
     private BigDecimal price;
+    private OrderStatus status;
     private List<BookItemDTO> bookItems;
 }

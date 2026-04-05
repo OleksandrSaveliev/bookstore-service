@@ -2,12 +2,14 @@ package com.my.bookstore.controller;
 
 import com.my.bookstore.dto.OrderRequestDTO;
 import com.my.bookstore.dto.OrderResponseDTO;
+import com.my.bookstore.model.enums.OrderStatus;
 import com.my.bookstore.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,5 +45,13 @@ public class OrderController {
     public ResponseEntity<OrderResponseDTO> addOrder(@Valid @RequestBody OrderRequestDTO requestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(orderService.addOrder(requestDTO));
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<OrderResponseDTO> updateStatus(
+            @PathVariable Long id,
+            @RequestParam OrderStatus status) {
+        return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
     }
 }
