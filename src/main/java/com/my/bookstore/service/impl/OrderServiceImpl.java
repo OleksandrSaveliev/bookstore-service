@@ -14,7 +14,6 @@ import com.my.bookstore.repo.OrderRepository;
 import com.my.bookstore.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
     private final ModelMapper modelMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponseDTO> getAllOrders() {
         return orderRepository.findAll().stream()
                 .map(order -> modelMapper.map(order, OrderResponseDTO.class))
@@ -45,18 +44,40 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderResponseDTO> getOrders(int page, int size, String sortBy, String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
-                ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
+    @Transactional(readOnly = true)
+    public Page<OrderResponseDTO> getAllOrders(int page, int size, String sortBy, String direction, String search) {
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return orderRepository.findAll(pageable)
-                .map(order -> modelMapper.map(order, OrderResponseDTO.class));
+
+        if (search == null || search.isBlank()) {
+            return orderRepository.findAll(pageable)
+                    .map(order -> modelMapper.map(order, OrderResponseDTO.class));
+        }
+
+        try {
+            Long userId = Long.parseLong(search.trim());
+            return orderRepository.findAllByClientUserId(userId, pageable)
+                    .map(order -> modelMapper.map(order, OrderResponseDTO.class));
+        } catch (NumberFormatException e) {
+            throw new NotFoundException("Invalid search ID: " + search);
+        }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponseDTO> getOrdersByClientId(Long clientId) {
         return orderRepository.findAllByClientUserId(clientId).stream()
+                .map(order -> modelMapper.map(order, OrderResponseDTO.class))
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponseDTO> getMyOrders() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return orderRepository.findAllByClientUserEmail(email).stream()
                 .map(order -> modelMapper.map(order, OrderResponseDTO.class))
                 .toList();
     }
@@ -71,6 +92,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order();
         order.setClient(client);
+        order.setStatus(OrderStatus.PENDING);
 
         List<Long> bookIds = requestDTO.getItems().stream()
                 .map(OrderItemRequestDTO::getBookId)
@@ -100,11 +122,13 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
 
         BigDecimal totalPrice = bookItems.stream()
-                .map(item -> item.getBook().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .map(item -> item.getBook().getPrice()
+                        .multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (client.getBalance().compareTo(totalPrice) < 0) {
-            throw new LowBalanceException("Insufficient balance. Required: " + totalPrice + ", Available: " + client.getBalance());
+            throw new LowBalanceException("Insufficient balance. Required: "
+                    + totalPrice + ", Available: " + client.getBalance());
         }
 
         client.setBalance(client.getBalance().subtract(totalPrice));
@@ -120,39 +144,15 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDTO updateOrderStatus(Long orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new NotFoundException("Order not found: " + orderId));
 
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new IllegalStateException("Cannot update an order that is already " + order.getStatus());
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException(
+                    "Cannot update order that is already " + order.getStatus());
         }
 
         order.setStatus(newStatus);
-        Order updatedOrder = orderRepository.save(order);
 
-        return modelMapper.map(updatedOrder, OrderResponseDTO.class);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<OrderResponseDTO> getAllOrders(int page, int size, String sortBy, String direction, String search) {
-
-        Sort sort = direction.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
-
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        if (search == null || search.trim().isEmpty()) {
-            return orderRepository.findAll(pageable)
-                    .map(order -> modelMapper.map(order, OrderResponseDTO.class));
-        }
-
-        try {
-            Long userId = Long.parseLong(search.trim());
-            Page<Order> orderPage = orderRepository.findAllByClientUserId(userId, pageable);
-            return orderPage.map(order -> modelMapper.map(order, OrderResponseDTO.class));
-        } catch (NumberFormatException e) {
-            throw new NotFoundException("Invalid Search ID: " + search);
-        }
+        return modelMapper.map(orderRepository.save(order), OrderResponseDTO.class);
     }
 }

@@ -12,6 +12,7 @@ import com.my.bookstore.repo.EmployeeProfileRepository;
 import com.my.bookstore.repo.UserRepository;
 import com.my.bookstore.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +26,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeProfileRepository employeeProfileRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Override
     public List<EmployeeResponseDTO> getAllEmployees() {
         return employeeProfileRepository.findAll().stream()
-                .map(this::toResponseDTO)
+                .map(profile -> modelMapper.map(profile, EmployeeResponseDTO.class))
                 .toList();
     }
 
@@ -37,7 +39,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeResponseDTO getEmployeeById(Long id) {
         EmployeeProfile profile = employeeProfileRepository.findByUserId(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
-        return toResponseDTO(profile);
+        return modelMapper.map(profile, EmployeeResponseDTO.class);
     }
 
     @Override
@@ -47,20 +49,16 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new AlreadyExistException("Email already in use: " + dto.getEmail());
         }
 
-        User user = new User();
-        user.setEmail(dto.getEmail());
+        User user = modelMapper.map(dto, User.class);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(Role.EMPLOYEE);
         User savedUser = userRepository.save(user);
 
-        EmployeeProfile profile = new EmployeeProfile();
+        EmployeeProfile profile = modelMapper.map(dto, EmployeeProfile.class);
         profile.setUser(savedUser);
-        profile.setName(dto.getName());
-        profile.setPhone(dto.getPhone());
-        profile.setBirthDate(dto.getBirthDate());
         employeeProfileRepository.save(profile);
 
-        return toResponseDTO(profile);
+        return modelMapper.map(profile, EmployeeResponseDTO.class);
     }
 
     @Override
@@ -69,27 +67,24 @@ public class EmployeeServiceImpl implements EmployeeService {
         EmployeeProfile profile = employeeProfileRepository.findByUserId(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
 
-        if (patchDTO.getName() != null && !patchDTO.getName().isBlank()) {
-            profile.setName(patchDTO.getName());
-        }
-        if (patchDTO.getPhone() != null && !patchDTO.getPhone().isBlank()) {
-            profile.setPhone(patchDTO.getPhone());
-        }
-        if (patchDTO.getBirthDate() != null) {
-            profile.setBirthDate(patchDTO.getBirthDate());
-        }
-        if (patchDTO.getEmail() != null && !patchDTO.getEmail().isBlank()) {
+        if (patchDTO.getEmail() != null && !patchDTO.getEmail().equals(profile.getUser().getEmail())) {
             if (userRepository.existsByEmail(patchDTO.getEmail())) {
                 throw new AlreadyExistException("Email already in use: " + patchDTO.getEmail());
             }
+        }
+
+        modelMapper.map(patchDTO, profile);
+
+        if (patchDTO.getEmail() != null) {
             profile.getUser().setEmail(patchDTO.getEmail());
         }
+
         if (patchDTO.getPassword() != null && !patchDTO.getPassword().isBlank()) {
             profile.getUser().setPassword(passwordEncoder.encode(patchDTO.getPassword()));
         }
 
         employeeProfileRepository.save(profile);
-        return toResponseDTO(profile);
+        return modelMapper.map(profile, EmployeeResponseDTO.class);
     }
 
     @Override
@@ -99,15 +94,5 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
         employeeProfileRepository.delete(profile);
         userRepository.deleteById(id);
-    }
-
-    private EmployeeResponseDTO toResponseDTO(EmployeeProfile profile) {
-        EmployeeResponseDTO dto = new EmployeeResponseDTO();
-        dto.setId(profile.getUser().getId());
-        dto.setEmail(profile.getUser().getEmail());
-        dto.setName(profile.getName());
-        dto.setPhone(profile.getPhone());
-        dto.setBirthDate(profile.getBirthDate());
-        return dto;
     }
 }

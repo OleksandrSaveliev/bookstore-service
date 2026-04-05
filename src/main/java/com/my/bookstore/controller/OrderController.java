@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,22 +22,19 @@ public class OrderController {
 
     private final OrderService orderService;
 
-//    @GetMapping
-//    public Page<OrderResponseDTO> getOrders(
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "10") int size,
-//            @RequestParam(defaultValue = "id") String sortBy,
-//            @RequestParam(defaultValue = "asc") String sortDir
-//    ) {
-//        return orderService.getOrders(page, size, sortBy, sortDir);
-//    }
-
     @GetMapping("/all")
     public ResponseEntity<List<OrderResponseDTO>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
 
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<List<OrderResponseDTO>> getMyOrders() {
+        return ResponseEntity.ok(orderService.getMyOrders());
+    }
+
     @GetMapping("/client/{clientId}")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<List<OrderResponseDTO>> getOrdersByClient(@PathVariable Long clientId) {
         return ResponseEntity.ok(orderService.getOrdersByClientId(clientId));
     }
@@ -56,7 +54,7 @@ public class OrderController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<Page<OrderResponseDTO>> getOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

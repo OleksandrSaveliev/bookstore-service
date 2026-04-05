@@ -1,6 +1,10 @@
 package com.my.bookstore.conf;
 
+import com.my.bookstore.dto.BookItemDTO;
+import com.my.bookstore.dto.EmployeeResponseDTO;
 import com.my.bookstore.dto.OrderResponseDTO;
+import com.my.bookstore.model.BookItem;
+import com.my.bookstore.model.EmployeeProfile;
 import com.my.bookstore.model.Order;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -26,6 +30,14 @@ public class BaseConfig implements WebMvcConfigurer {
 
         modelMapper.typeMap(Order.class, OrderResponseDTO.class)
                 .addMapping(src -> src.getClient().getUser().getId(), OrderResponseDTO::setClientId);
+
+        modelMapper.typeMap(BookItem.class, BookItemDTO.class)
+                .addMapping(src -> src.getBook().getId(), BookItemDTO::setBookId);
+
+        modelMapper.typeMap(EmployeeProfile.class, EmployeeResponseDTO.class).addMappings(m -> {
+            m.map(src -> src.getUser().getEmail(), EmployeeResponseDTO::setEmail);
+            m.map(src -> src.getUser().getId(), EmployeeResponseDTO::setId);
+        });
 
         return modelMapper;
     }

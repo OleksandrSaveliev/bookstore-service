@@ -13,11 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderResponseDTO {
     private Long id;
-
     private Long clientId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
     private BigDecimal price;
     private OrderStatus status;
     private List<BookItemDTO> bookItems;

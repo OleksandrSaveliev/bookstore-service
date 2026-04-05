@@ -93,7 +93,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/clients/**").hasAnyRole("EMPLOYEE", "CLIENT")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/clients/**").hasRole("EMPLOYEE")
 
-                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyRole("EMPLOYEE", "CLIENT")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/my").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/client/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.POST, "/api/v1/orders/**").hasRole("CLIENT")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/**").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/orders/**").hasRole("EMPLOYEE")

@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface OrderService {
     List<OrderResponseDTO> getAllOrders();
-    Page<OrderResponseDTO> getOrders(int page, int size, String sortBy, String sortDir);
     List<OrderResponseDTO> getOrdersByClientId(Long clientId);
     OrderResponseDTO addOrder(OrderRequestDTO order);
     OrderResponseDTO updateOrderStatus(Long id, OrderStatus status);
     Page<OrderResponseDTO> getAllOrders(int page, int size, String sortBy, String direction, String search);
+    List<OrderResponseDTO> getMyOrders();
 }
