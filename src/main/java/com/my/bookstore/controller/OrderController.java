@@ -21,15 +21,15 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @GetMapping
-    public Page<OrderResponseDTO> getOrders(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir
-    ) {
-        return orderService.getOrders(page, size, sortBy, sortDir);
-    }
+//    @GetMapping
+//    public Page<OrderResponseDTO> getOrders(
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size,
+//            @RequestParam(defaultValue = "id") String sortBy,
+//            @RequestParam(defaultValue = "asc") String sortDir
+//    ) {
+//        return orderService.getOrders(page, size, sortBy, sortDir);
+//    }
 
     @GetMapping("/all")
     public ResponseEntity<List<OrderResponseDTO>> getAllOrders() {
@@ -53,5 +53,19 @@ public class OrderController {
             @PathVariable Long id,
             @RequestParam OrderStatus status) {
         return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    public ResponseEntity<Page<OrderResponseDTO>> getOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(required = false) String search) {
+
+        Page<OrderResponseDTO> orders = orderService.getAllOrders(page, size, sortBy, direction, search);
+
+        return ResponseEntity.ok(orders);
     }
 }

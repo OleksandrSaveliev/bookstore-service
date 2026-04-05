@@ -14,6 +14,7 @@ import com.my.bookstore.repo.OrderRepository;
 import com.my.bookstore.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,7 +71,6 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order();
         order.setClient(client);
-        order.setOrderDate(LocalDateTime.now());
 
         List<Long> bookIds = requestDTO.getItems().stream()
                 .map(OrderItemRequestDTO::getBookId)
@@ -130,5 +130,29 @@ public class OrderServiceImpl implements OrderService {
         Order updatedOrder = orderRepository.save(order);
 
         return modelMapper.map(updatedOrder, OrderResponseDTO.class);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderResponseDTO> getAllOrders(int page, int size, String sortBy, String direction, String search) {
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        if (search == null || search.trim().isEmpty()) {
+            return orderRepository.findAll(pageable)
+                    .map(order -> modelMapper.map(order, OrderResponseDTO.class));
+        }
+
+        try {
+            Long userId = Long.parseLong(search.trim());
+            Page<Order> orderPage = orderRepository.findAllByClientUserId(userId, pageable);
+            return orderPage.map(order -> modelMapper.map(order, OrderResponseDTO.class));
+        } catch (NumberFormatException e) {
+            throw new NotFoundException("Invalid Search ID: " + search);
+        }
     }
 }
