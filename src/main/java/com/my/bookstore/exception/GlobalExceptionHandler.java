@@ -20,7 +20,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
-        log.error("Not found: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.builder()
@@ -32,7 +31,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AlreadyExistException.class)
     public ResponseEntity<ErrorResponse> handleAlreadyExistException(AlreadyExistException ex) {
-        log.error("Already exists: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.builder()
@@ -44,7 +42,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(OutOfStockException.class)
     public ResponseEntity<ErrorResponse> handleOutOfStockException(OutOfStockException ex) {
-        log.error("Out of stock: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.builder()
@@ -56,7 +53,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(LowBalanceException.class)
     public ResponseEntity<ErrorResponse> handleLowBalanceException(LowBalanceException ex) {
-        log.error("Low balance: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.builder()
@@ -68,7 +64,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
-        log.error("Bad credentials: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(ErrorResponse.builder()
@@ -79,22 +74,24 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
-        log.error("Validation failed");
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String field = ((FieldError) error).getField();
-            String message = error.getDefaultMessage();
-            errors.put(field, message);
-        });
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(errors);
+                .body(ErrorResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .message("Validation failed")
+                        .errors(errors)
+                        .timestamp(LocalDateTime.now())
+                        .build());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
-        log.error("Access denied: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.builder()
@@ -106,7 +103,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-        log.error("Unexpected error: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.builder()

@@ -8,14 +8,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignupRequestDTO {
-    @NotBlank
-    @Email
+    @NotBlank(message = "Email is required")
+    @Email(message = "Please enter a valid email address")
     private String email;
 
-    @NotBlank
-    @Size(min = 6)
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "Name is required")
     private String name;
 }

@@ -1,4 +1,4 @@
-package com.my.bookstore.conf;
+package com.my.bookstore.config;
 
 import com.my.bookstore.dto.BookItemDTO;
 import com.my.bookstore.dto.BookItemResponseDTO;
