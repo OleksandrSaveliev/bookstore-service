@@ -12,6 +12,7 @@ import com.my.bookstore.repo.ClientProfileRepository;
 import com.my.bookstore.repo.UserRepository;
 import com.my.bookstore.security.JwtUtils;
 import com.my.bookstore.service.AuthService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +24,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -40,29 +44,37 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final ClientProfileRepository clientProfileRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserDetailsService userDetailsService;
 
     @Value("${app.cookie.secure}")
     private boolean cookieSecure;
 
-    private static final String COOKIE_NAME = "jwt";
-    private static final int COOKIE_MAX_AGE = 24 * 60 * 60;
+    private static final String ACCESS_COOKIE = "jwt";
+    private static final String REFRESH_COOKIE = "refresh_token";
+
+    private static final String ACCESS_PATH = "/";
+    private static final String REFRESH_PATH = "/api/v1/auth/refresh";
+
+    private static final int ACCESS_MAX_AGE = 15 * 60;           // 15 minutes
+    private static final int REFRESH_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
     @Override
     public AuthResponseDTO login(LoginRequestDTO request, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        addJwtCookie(response, jwtUtils.generateToken(authentication.getName()));
 
-        List<String> roles = authentication.getAuthorities()
-                .stream()
+        String email = authentication.getName();
+        addAccessCookie(response, jwtUtils.generateToken(email));
+        addRefreshCookie(response, jwtUtils.generateRefreshToken(email));
+
+        List<String> roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new NotFoundException("User not found: " + request.getEmail()));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found: " + email));
 
         return new AuthResponseDTO(user.getId(), user.getEmail(), roles);
     }
@@ -86,31 +98,79 @@ public class AuthServiceImpl implements AuthService {
         profile.setBalance(BigDecimal.ZERO);
         clientProfileRepository.save(profile);
 
-        addJwtCookie(response, jwtUtils.generateToken(savedUser.getEmail()));
+        addAccessCookie(response, jwtUtils.generateToken(savedUser.getEmail()));
+        addRefreshCookie(response, jwtUtils.generateRefreshToken(savedUser.getEmail()));
 
         return new AuthResponseDTO(savedUser.getId(), savedUser.getEmail(), List.of("ROLE_CLIENT"));
     }
 
     @Override
+    public AuthResponseDTO refresh(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = null;
+        if (request.getCookies() != null) {
+            refreshToken = Arrays.stream(request.getCookies())
+                    .filter(c -> REFRESH_COOKIE.equals(c.getName()))
+                    .map(Cookie::getValue)
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        if (refreshToken == null || !jwtUtils.validateToken(refreshToken)) {
+            throw new NotFoundException("Invalid or missing refresh token");
+        }
+
+        String email = jwtUtils.getEmailFromToken(refreshToken);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+        addAccessCookie(response, jwtUtils.generateToken(email));
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found: " + email));
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        log.info("Access token refreshed for: {}", email);
+        return new AuthResponseDTO(user.getId(), user.getEmail(), roles);
+    }
+
+    @Override
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, "")
-                .httpOnly(true)
-                .secure(cookieSecure)
-                .path("/")
-                .maxAge(0)
-                .sameSite("Strict")
-                .build();
-        response.addHeader("Set-Cookie", cookie.toString());
+        clearCookie(response, ACCESS_COOKIE, ACCESS_PATH);
+        clearCookie(response, REFRESH_COOKIE, REFRESH_PATH);
         SecurityContextHolder.clearContext();
     }
 
-    private void addJwtCookie(HttpServletResponse response, String token) {
-        ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, token)
+    private void addAccessCookie(HttpServletResponse response, String token) {
+        ResponseCookie cookie = ResponseCookie.from(ACCESS_COOKIE, token)
                 .httpOnly(true)
                 .secure(cookieSecure)
-                .path("/")
-                .maxAge(COOKIE_MAX_AGE)
+                .path(ACCESS_PATH)
+                .maxAge(ACCESS_MAX_AGE)
                 .sameSite("Lax")
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
+    }
+
+    private void addRefreshCookie(HttpServletResponse response, String token) {
+        ResponseCookie cookie = ResponseCookie.from(REFRESH_COOKIE, token)
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .path(REFRESH_PATH)
+                .maxAge(REFRESH_MAX_AGE)
+                .sameSite("Strict")
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
+    }
+
+    private void clearCookie(HttpServletResponse response, String name, String path) {
+        ResponseCookie cookie = ResponseCookie.from(name, "")
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .path(path)
+                .maxAge(0)
+                .sameSite("Strict")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
     }

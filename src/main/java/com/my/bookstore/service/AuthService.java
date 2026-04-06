@@ -9,5 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 public interface AuthService {
     AuthResponseDTO login(LoginRequestDTO request, HttpServletResponse response);
     AuthResponseDTO signup(SignupRequestDTO request, HttpServletResponse response);
+
+    AuthResponseDTO refresh(HttpServletRequest request, HttpServletResponse response);
+
     void logout(HttpServletRequest request, HttpServletResponse response);
 }
