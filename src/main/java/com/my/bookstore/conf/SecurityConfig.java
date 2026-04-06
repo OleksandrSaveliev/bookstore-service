@@ -72,33 +72,33 @@ public class SecurityConfig {
                         exception.authenticationEntryPoint(unauthorizedHandler))
                 .authorizeHttpRequests(auth -> auth
 
-                        // public
                         .requestMatchers(
-                                "/",
-                                "/api/v1/auth/**",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/h2-console/**"
+                                "/", "/api/v1/auth/**",
+                                "/css/**", "/js/**", "/images/**", "/h2-console/**"
                         ).permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/api/v1/books/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/books/**").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/books/**").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/books/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET,    "/api/v1/books/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,   "/api/v1/books/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH,  "/api/v1/books/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/books/**").hasAnyRole("EMPLOYEE", "ADMIN")
 
-                        .requestMatchers("/api/v1/employees/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET,    "/api/v1/employees/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.POST,   "/api/v1/employees/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH,  "/api/v1/employees/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/employees/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.GET, "/api/v1/clients/**").hasAnyRole("EMPLOYEE", "CLIENT")
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/clients/**").hasAnyRole("EMPLOYEE", "CLIENT")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/clients/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET,    "/api/v1/clients/**").hasAnyRole("EMPLOYEE", "CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH,  "/api/v1/clients/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/clients/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/my").hasRole("CLIENT")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/client/**").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/orders/**").hasRole("CLIENT")
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/**").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/orders/**").hasRole("EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET,    "/api/v1/orders/my").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.GET,    "/api/v1/orders/client/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.GET,    "/api/v1/orders/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.POST,   "/api/v1/orders/**").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.PATCH,  "/api/v1/orders/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/orders/**").hasRole("ADMIN")
+
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
