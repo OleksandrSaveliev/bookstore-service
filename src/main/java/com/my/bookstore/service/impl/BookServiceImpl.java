@@ -9,6 +9,7 @@ import com.my.bookstore.model.Book;
 import com.my.bookstore.model.enums.AgeGroup;
 import com.my.bookstore.model.enums.Language;
 import com.my.bookstore.repo.BookRepository;
+import com.my.bookstore.repo.specification.BookSpecifications;
 import com.my.bookstore.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,19 +31,18 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional(readOnly = true)
     public Page<BookResponseDTO> getBooks(int page, int size, String sortBy, String sortDir,
-                                          String search, String genre,
-                                          AgeGroup ageGroup, Language language) {
+                                          String search, String genre, AgeGroup ageGroup, Language language) {
         Sort sort = sortDir.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return bookRepository.findAllWithFilters(
-                        search == null || search.isBlank() ? null : search.trim(),
-                        genre == null || genre.isBlank() ? null : genre.trim(),
-                        ageGroup,
-                        language,
-                        pageable)
+        Specification<Book> spec = BookSpecifications.hasSearchText(search)
+                .and(BookSpecifications.hasGenre(genre))
+                .and(BookSpecifications.hasAgeGroup(ageGroup))
+                .and(BookSpecifications.hasLanguage(language));
+
+        return bookRepository.findAll(spec, pageable)
                 .map(book -> modelMapper.map(book, BookResponseDTO.class));
     }
 
@@ -109,8 +110,8 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public void deleteBookById(Long id) {
-        Book book = bookRepository.findById(id)
+        bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Book not found: " + id));
-        bookRepository.delete(book);
+        bookRepository.deleteById(id);
     }
 }

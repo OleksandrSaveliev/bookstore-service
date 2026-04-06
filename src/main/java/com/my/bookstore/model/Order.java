@@ -42,6 +42,6 @@ public class Order {
     private OrderStatus status = OrderStatus.PENDING;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    @BatchSize(size = 10)
+    @BatchSize(size = 20)
     private List<BookItem> bookItems;
 }
