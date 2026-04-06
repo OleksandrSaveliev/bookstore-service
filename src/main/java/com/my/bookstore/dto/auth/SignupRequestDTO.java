@@ -1,4 +1,4 @@
-package com.my.bookstore.dto;
+package com.my.bookstore.dto.auth;
 
 import jakarta.validation.constraints.*;
 import lombok.*;

@@ -1,8 +1,8 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.BookPatchDTO;
-import com.my.bookstore.dto.BookRequestDTO;
-import com.my.bookstore.dto.BookResponseDTO;
+import com.my.bookstore.dto.book.BookPatchDTO;
+import com.my.bookstore.dto.book.BookRequestDTO;
+import com.my.bookstore.dto.book.BookResponseDTO;
 import com.my.bookstore.model.enums.AgeGroup;
 import com.my.bookstore.model.enums.Language;
 import com.my.bookstore.service.BookService;

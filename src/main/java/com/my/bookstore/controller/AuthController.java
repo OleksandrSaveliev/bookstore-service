@@ -1,8 +1,8 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.AuthResponseDTO;
-import com.my.bookstore.dto.LoginRequestDTO;
-import com.my.bookstore.dto.SignupRequestDTO;
+import com.my.bookstore.dto.auth.AuthResponseDTO;
+import com.my.bookstore.dto.auth.LoginRequestDTO;
+import com.my.bookstore.dto.auth.SignupRequestDTO;
 import com.my.bookstore.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

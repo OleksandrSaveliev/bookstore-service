@@ -1,6 +1,6 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.EmployeeResponseDTO;
+import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.EmployeeProfile;
 import com.my.bookstore.repo.EmployeeProfileRepository;

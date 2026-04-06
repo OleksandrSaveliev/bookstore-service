@@ -1,9 +1,9 @@
 package com.my.bookstore.config;
 
-import com.my.bookstore.dto.BookItemDTO;
-import com.my.bookstore.dto.BookItemResponseDTO;
-import com.my.bookstore.dto.EmployeeResponseDTO;
-import com.my.bookstore.dto.OrderResponseDTO;
+import com.my.bookstore.dto.book.BookItemDTO;
+import com.my.bookstore.dto.book.BookItemResponseDTO;
+import com.my.bookstore.dto.employee.EmployeeResponseDTO;
+import com.my.bookstore.dto.order.OrderResponseDTO;
 import com.my.bookstore.model.BookItem;
 import com.my.bookstore.model.EmployeeProfile;
 import com.my.bookstore.model.Order;

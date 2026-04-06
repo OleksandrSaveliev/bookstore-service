@@ -1,7 +1,7 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.ClientPatchDTO;
-import com.my.bookstore.dto.ClientResponseDTO;
+import com.my.bookstore.dto.client.ClientPatchDTO;
+import com.my.bookstore.dto.client.ClientResponseDTO;
 import com.my.bookstore.exception.AlreadyExistException;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.ClientProfile;

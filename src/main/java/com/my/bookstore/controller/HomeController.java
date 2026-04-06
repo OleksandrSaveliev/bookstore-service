@@ -1,6 +1,6 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.BookResponseDTO;
+import com.my.bookstore.dto.book.BookResponseDTO;
 import com.my.bookstore.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

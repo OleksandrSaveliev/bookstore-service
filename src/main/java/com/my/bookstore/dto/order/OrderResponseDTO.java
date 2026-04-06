@@ -1,5 +1,6 @@
-package com.my.bookstore.dto;
+package com.my.bookstore.dto.order;
 
+import com.my.bookstore.dto.book.BookItemResponseDTO;
 import com.my.bookstore.model.enums.OrderStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

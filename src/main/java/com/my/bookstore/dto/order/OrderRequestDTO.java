@@ -1,5 +1,5 @@
 
-package com.my.bookstore.dto;
+package com.my.bookstore.dto.order;
 import lombok.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.Valid;

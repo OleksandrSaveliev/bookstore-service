@@ -1,5 +1,7 @@
-package com.my.bookstore.dto;
+package com.my.bookstore.dto.book;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +11,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookItemResponseDTO {
+public class BookItemDTO {
+
+    @NotNull
     private Long bookId;
-    private String bookName;
+
+    @NotNull
+    @Positive
     private Integer quantity;
 }

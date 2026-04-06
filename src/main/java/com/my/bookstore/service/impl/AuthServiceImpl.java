@@ -1,8 +1,8 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.AuthResponseDTO;
-import com.my.bookstore.dto.LoginRequestDTO;
-import com.my.bookstore.dto.SignupRequestDTO;
+import com.my.bookstore.dto.auth.AuthResponseDTO;
+import com.my.bookstore.dto.auth.LoginRequestDTO;
+import com.my.bookstore.dto.auth.SignupRequestDTO;
 import com.my.bookstore.exception.AlreadyExistException;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.ClientProfile;

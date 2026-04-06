@@ -1,4 +1,4 @@
-package com.my.bookstore.dto;
+package com.my.bookstore.dto.order;
 
 import com.my.bookstore.model.enums.OrderStatus;
 import jakarta.validation.constraints.NotNull;

@@ -1,8 +1,8 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.EmployeeDTO;
-import com.my.bookstore.dto.EmployeePatchDTO;
-import com.my.bookstore.dto.EmployeeResponseDTO;
+import com.my.bookstore.dto.employee.EmployeeDTO;
+import com.my.bookstore.dto.employee.EmployeePatchDTO;
+import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.exception.AlreadyExistException;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.EmployeeProfile;

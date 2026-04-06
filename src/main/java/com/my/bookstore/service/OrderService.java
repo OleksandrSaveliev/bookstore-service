@@ -1,7 +1,7 @@
 package com.my.bookstore.service;
 
-import com.my.bookstore.dto.OrderRequestDTO;
-import com.my.bookstore.dto.OrderResponseDTO;
+import com.my.bookstore.dto.order.OrderRequestDTO;
+import com.my.bookstore.dto.order.OrderResponseDTO;
 import com.my.bookstore.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import java.util.List;

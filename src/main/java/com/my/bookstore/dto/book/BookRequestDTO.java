@@ -1,4 +1,4 @@
-package com.my.bookstore.dto;
+package com.my.bookstore.dto.book;
 
 import com.my.bookstore.model.enums.AgeGroup;
 import com.my.bookstore.model.enums.Language;

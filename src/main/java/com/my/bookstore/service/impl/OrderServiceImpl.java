@@ -1,8 +1,8 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.OrderItemRequestDTO;
-import com.my.bookstore.dto.OrderRequestDTO;
-import com.my.bookstore.dto.OrderResponseDTO;
+import com.my.bookstore.dto.order.OrderItemRequestDTO;
+import com.my.bookstore.dto.order.OrderRequestDTO;
+import com.my.bookstore.dto.order.OrderResponseDTO;
 import com.my.bookstore.exception.LowBalanceException;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.exception.OutOfStockException;

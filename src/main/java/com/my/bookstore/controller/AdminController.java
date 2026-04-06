@@ -1,8 +1,8 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.EmployeeDTO;
-import com.my.bookstore.dto.EmployeePatchDTO;
-import com.my.bookstore.dto.EmployeeResponseDTO;
+import com.my.bookstore.dto.employee.EmployeeDTO;
+import com.my.bookstore.dto.employee.EmployeePatchDTO;
+import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.service.AdminService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

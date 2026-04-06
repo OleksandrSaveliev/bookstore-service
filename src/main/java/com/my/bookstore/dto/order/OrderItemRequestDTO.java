@@ -1,4 +1,4 @@
-package com.my.bookstore.dto;
+package com.my.bookstore.dto.order;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

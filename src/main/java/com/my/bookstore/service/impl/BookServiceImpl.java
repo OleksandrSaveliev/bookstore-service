@@ -1,8 +1,8 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.BookPatchDTO;
-import com.my.bookstore.dto.BookRequestDTO;
-import com.my.bookstore.dto.BookResponseDTO;
+import com.my.bookstore.dto.book.BookPatchDTO;
+import com.my.bookstore.dto.book.BookRequestDTO;
+import com.my.bookstore.dto.book.BookResponseDTO;
 import com.my.bookstore.exception.AlreadyExistException;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.Book;

@@ -1,7 +1,7 @@
 package com.my.bookstore.service;
 
-import com.my.bookstore.dto.ClientPatchDTO;
-import com.my.bookstore.dto.ClientResponseDTO;
+import com.my.bookstore.dto.client.ClientPatchDTO;
+import com.my.bookstore.dto.client.ClientResponseDTO;
 
 import java.util.List;
 

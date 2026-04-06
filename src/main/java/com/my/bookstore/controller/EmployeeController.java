@@ -1,6 +1,6 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.EmployeeResponseDTO;
+import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

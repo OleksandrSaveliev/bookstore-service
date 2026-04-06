@@ -1,13 +1,11 @@
 package com.my.bookstore.service;
 
-import com.my.bookstore.dto.BookPatchDTO;
-import com.my.bookstore.dto.BookRequestDTO;
-import com.my.bookstore.dto.BookResponseDTO;
-import com.my.bookstore.model.Book;
+import com.my.bookstore.dto.book.BookPatchDTO;
+import com.my.bookstore.dto.book.BookRequestDTO;
+import com.my.bookstore.dto.book.BookResponseDTO;
 import com.my.bookstore.model.enums.AgeGroup;
 import com.my.bookstore.model.enums.Language;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 public interface BookService {
     Page<BookResponseDTO> getBooks(int page, int size, String sortBy, String sortDir,
