@@ -1,6 +1,7 @@
 package com.my.bookstore.config;
 
 import com.my.bookstore.security.AuthTokenFilter;
+import com.my.bookstore.security.CustomAccessDeniedHandler;
 import com.my.bookstore.security.JwtUtils;
 import com.my.bookstore.service.impl.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
     private final AuthenticationEntryPoint unauthorizedHandler;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public AuthTokenFilter authenticationTokenFilterJwt() {
@@ -64,12 +66,17 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
+
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .exceptionHandling(exception ->
-                        exception.authenticationEntryPoint(unauthorizedHandler))
+                        exception.authenticationEntryPoint(unauthorizedHandler)
+                                .accessDeniedHandler(accessDeniedHandler))
+
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(

@@ -163,9 +163,9 @@ class OrderControllerTest {
         when(orderService.updateOrderStatus(1L, OrderStatus.PENDING)).thenReturn(updated);
 
         mockMvc.perform(patch("/api/v1/orders/1/status")
-                        .param("status", "CONFIRMED"))
+                        .param("status", "PENDING"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("CONFIRMED"));
+                .andExpect(jsonPath("$.status").value("PENDING"));
     }
 
     @Test

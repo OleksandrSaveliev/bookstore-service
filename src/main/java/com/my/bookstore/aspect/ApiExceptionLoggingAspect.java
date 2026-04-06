@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Aspect
 @Component
-public class ApiExceptionLoggerAspect {
+public class ApiExceptionLoggingAspect {
 
     @AfterReturning(
             pointcut = "execution(* com.my.bookstore.exception.GlobalExceptionHandler.*(..))",
@@ -25,8 +25,7 @@ public class ApiExceptionLoggerAspect {
             if (status >= 500) {
                 log.error("[API ERROR] 500 Internal Server Error in {} | Body: {}", handlerMethod, body);
             } else if (status >= 400) {
-                log.warn("[API WARN] {} {} in {} | Body: {}", status,
-                        responseEntity.getStatusCode().value(), handlerMethod, body);
+                log.warn("[API WARN] {} in {} | Body: {}", status, handlerMethod, body);
             }
         }
     }
