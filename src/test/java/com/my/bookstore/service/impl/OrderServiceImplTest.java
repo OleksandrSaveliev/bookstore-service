@@ -72,10 +72,6 @@ class OrderServiceImplTest {
         return dto;
     }
 
-    // ------------------------------------------------------------------
-    // Setup / teardown
-    // ------------------------------------------------------------------
-
     @BeforeEach
     void setUp() {
         User user = new User();
@@ -129,8 +125,6 @@ class OrderServiceImplTest {
         assertThat(result).isEmpty();
     }
 
-    // getAllOrders() — paginated
-
     @Test
     void getAllOrders_paginated_noSearch_returnsPage() {
         Page<Order> page = new PageImpl<>(List.of(order));
@@ -175,8 +169,6 @@ class OrderServiceImplTest {
                 .hasMessageContaining("invalid");
     }
 
-    // getOrdersByClientId
-
     @Test
     void getOrdersByClientId_returnsMappedList() {
         when(orderRepository.findAllByClientUserId(1L)).thenReturn(List.of(order));
@@ -195,8 +187,6 @@ class OrderServiceImplTest {
 
         assertThat(result).isEmpty();
     }
-
-    // getMyOrders
 
     @Test
     void getMyOrders_returnsOrdersForAuthenticatedUser() {
@@ -219,8 +209,6 @@ class OrderServiceImplTest {
 
         assertThat(result).isEmpty();
     }
-
-    // addOrder
 
     @Test
     void addOrder_validRequest_savesOrderAndDeductsBalanceAndStock() {
@@ -314,8 +302,6 @@ class OrderServiceImplTest {
 
         verify(orderRepository, never()).save(any());
     }
-
-    // updateOrderStatus
 
     @Test
     void updateOrderStatus_validTransition_updatesAndReturnsDTO() {

@@ -59,8 +59,6 @@ class ClientServiceImplTest {
         profile.setBalance(BigDecimal.valueOf(100));
     }
 
-    // --- getAllClients ---
-
     @Test
     void getAllClients_returnsListOfDTOs() {
         when(clientProfileRepository.findAll()).thenReturn(List.of(profile));
@@ -78,8 +76,6 @@ class ClientServiceImplTest {
 
         assertThat(clientService.getAllClients()).isEmpty();
     }
-
-    // --- getClientById ---
 
     @Test
     void getClientById_found_returnsDTO() {
@@ -100,8 +96,6 @@ class ClientServiceImplTest {
                 .hasMessageContaining("99");
     }
 
-    // --- deleteClientById ---
-
     @Test
     void deleteClient_found_deletesProfileAndUser() {
         when(clientProfileRepository.findByUserId(1L)).thenReturn(Optional.of(profile));
@@ -121,8 +115,6 @@ class ClientServiceImplTest {
 
         verify(userRepository, never()).deleteById(any());
     }
-
-    // --- patchClientById ---
 
     @Test
     void patchClient_updatesNameAndBalance() {

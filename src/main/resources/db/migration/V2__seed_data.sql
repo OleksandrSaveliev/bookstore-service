@@ -1,29 +1,18 @@
--- ============================================================
--- USERS (Password: password123)
--- ============================================================
+
 INSERT INTO users (email, password, role) VALUES
                                               ('employee@bookstore.com', '$2a$10$wvpSaiTftBQRPe1VerIey.Nx5TnclSEouhQN35O4.9WqAcEiefVxu', 'EMPLOYEE'),
                                               ('client@bookstore.com',   '$2a$10$wvpSaiTftBQRPe1VerIey.Nx5TnclSEouhQN35O4.9WqAcEiefVxu', 'CLIENT'),
                                               ('admin@bookstore.com',    '$2a$10$wvpSaiTftBQRPe1VerIey.Nx5TnclSEouhQN35O4.9WqAcEiefVxu', 'ADMIN');
 
--- ============================================================
--- PROFILES (Linking to Users)
--- ============================================================
-
--- EMPLOYEE PROFILES
 INSERT INTO employee_profiles (user_id, name, phone, birth_date)
 SELECT id, 'Alice Johnson', '+380991234567', '1990-05-15' FROM users WHERE email = 'employee@bookstore.com';
 
 INSERT INTO employee_profiles (user_id, name, phone, birth_date)
 SELECT id, 'System Administrator', '+380440000000', '1985-01-01' FROM users WHERE email = 'admin@bookstore.com';
 
--- CLIENT PROFILE
 INSERT INTO client_profiles (user_id, name, balance)
 SELECT id, 'Bob Smith', 500.00 FROM users WHERE email = 'client@bookstore.com';
 
--- ============================================================
--- BOOKS (50 Total)
--- ============================================================
 INSERT INTO books (name, genre, age_group, price, publication_year, author, number_of_pages, stock, characteristics, description, language) VALUES
                                                                                                                                                 ('The Great Gatsby', 'Fiction', 'ADULT', 12.99, '1925-04-10', 'F. Scott Fitzgerald', 180, 25, 'Classic American novel', 'A story of wealth and obsession in the Jazz Age.', 'ENGLISH'),
                                                                                                                                                 ('To Kill a Mockingbird', 'Fiction', 'TEEN', 14.99, '1960-07-11', 'Harper Lee', 281, 30, 'Pulitzer Prize winner', 'A powerful story of racial injustice in the American South.', 'ENGLISH'),

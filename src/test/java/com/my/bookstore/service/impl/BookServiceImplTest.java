@@ -59,8 +59,6 @@ class BookServiceImplTest {
         responseDTO.setName("Clean Code");
     }
 
-    // --- getBooks ---
-
     @Test
     void getBooks_noFilters_returnsPageOfDTOs() {
         Page<Book> bookPage = new PageImpl<>(List.of(book));
@@ -90,8 +88,6 @@ class BookServiceImplTest {
         verify(bookRepository).findAll(any(Specification.class), any(Pageable.class));
     }
 
-    // --- getBookById ---
-
     @Test
     void getBookById_found_returnsDTO() {
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
@@ -110,8 +106,6 @@ class BookServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("99");
     }
-
-    // --- addBook ---
 
     @Test
     void addBook_newTitle_savesAndReturnsDTO() {
@@ -142,8 +136,6 @@ class BookServiceImplTest {
 
         verify(bookRepository, never()).save(any());
     }
-
-    // --- patchBookById ---
 
     @Test
     void patchBook_updatesOnlyNonNullFields() {
@@ -177,8 +169,6 @@ class BookServiceImplTest {
         assertThatThrownBy(() -> bookService.patchBookById(99L, new BookPatchDTO()))
                 .isInstanceOf(NotFoundException.class);
     }
-
-    // --- deleteBookById ---
 
     @Test
     void deleteBook_found_deletesSuccessfully() {

@@ -67,8 +67,6 @@ class AdminServiceImplTest {
         responseDTO.setName("John");
     }
 
-    // --- getAllUsers ---
-
     @Test
     void getAllUsers_returnsListOfDTOsWithRolesList() {
         User user2 = new User();
@@ -104,8 +102,6 @@ class AdminServiceImplTest {
         assertThat(adminService.getAllUsers()).isEmpty();
     }
 
-    // --- getAllEmployees ---
-
     @Test
     void getAllEmployees_returnsListOfDTOs() {
         when(employeeProfileRepository.findAll()).thenReturn(List.of(profile));
@@ -122,8 +118,6 @@ class AdminServiceImplTest {
         when(employeeProfileRepository.findAll()).thenReturn(List.of());
         assertThat(adminService.getAllEmployees()).isEmpty();
     }
-
-    // --- getEmployeeById ---
 
     @Test
     void getEmployeeById_found_returnsDTO() {
@@ -143,8 +137,6 @@ class AdminServiceImplTest {
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("99");
     }
-
-    // --- addEmployee ---
 
     @Test
     void addEmployee_success_savesUserAndProfile() {
@@ -179,8 +171,6 @@ class AdminServiceImplTest {
 
         verifyNoInteractions(employeeProfileRepository);
     }
-
-    // --- patchEmployee ---
 
     @Test
     void patchEmployee_updatesEmailAndPassword() {
@@ -240,8 +230,6 @@ class AdminServiceImplTest {
                 .isInstanceOf(NotFoundException.class);
     }
 
-    // --- deleteEmployee ---
-
     @Test
     void deleteEmployee_success_deletesProfileAndUser() {
         when(employeeProfileRepository.findByUserId(1L)).thenReturn(Optional.of(profile));
@@ -261,8 +249,6 @@ class AdminServiceImplTest {
 
         verify(userRepository, never()).deleteById(any());
     }
-
-    // --- changeUserRole ---
 
     @Test
     void changeUserRole_validRole_updatesRole() {

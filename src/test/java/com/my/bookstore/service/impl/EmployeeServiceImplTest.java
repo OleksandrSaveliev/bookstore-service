@@ -53,8 +53,6 @@ class EmployeeServiceImplTest {
         responseDTO.setName("Jane");
     }
 
-    // --- getAllEmployees ---
-
     @Test
     void getAllEmployees_returnsListOfDTOs() {
         when(employeeProfileRepository.findAll()).thenReturn(List.of(profile));
@@ -72,8 +70,6 @@ class EmployeeServiceImplTest {
 
         assertThat(employeeService.getAllEmployees()).isEmpty();
     }
-
-    // --- getEmployeeById ---
 
     @Test
     void getEmployeeById_found_returnsDTO() {

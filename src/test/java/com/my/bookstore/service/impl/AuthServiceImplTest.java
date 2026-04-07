@@ -79,8 +79,6 @@ class AuthServiceImplTest {
         user.setRole(Role.CLIENT);
     }
 
-    // --- login ---
-
     @Test
     void login_validCredentials_returnsAuthResponse() {
         LoginRequestDTO dto = new LoginRequestDTO("user@test.com", "pass");
@@ -126,8 +124,6 @@ class AuthServiceImplTest {
                 .hasMessageContaining("User not found");
     }
 
-    // --- signup ---
-
     @Test
     void signup_newEmail_createsUserAndClientProfile() {
         SignupRequestDTO dto = new SignupRequestDTO("new@test.com", "pass", "New User");
@@ -156,8 +152,6 @@ class AuthServiceImplTest {
 
         verifyNoInteractions(clientProfileRepository);
     }
-
-    // --- refresh ---
 
     @Test
     void refresh_validRefreshToken_returnsNewAccessToken() {
@@ -198,7 +192,6 @@ class AuthServiceImplTest {
                 .build();
         when(userDetailsService.loadUserByUsername("user@test.com")).thenReturn(userDetails);
 
-        // This simulates the user being deleted from DB while they still have a valid token
         when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> authService.refresh(request, response))
@@ -224,8 +217,6 @@ class AuthServiceImplTest {
         assertThatThrownBy(() -> authService.refresh(request, response))
                 .isInstanceOf(NotFoundException.class);
     }
-
-    // --- logout ---
 
     @Test
     void logout_clearsBothCookies() {
