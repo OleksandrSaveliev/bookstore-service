@@ -29,4 +29,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @EntityGraph(attributePaths = {"client", "client.user", "bookItems", "bookItems.book"})
     @Query("SELECT o FROM Order o WHERE o.client.user.email = :email")
     List<Order> findAllByClientUserEmail(@Param("email") String email);
+
 }
