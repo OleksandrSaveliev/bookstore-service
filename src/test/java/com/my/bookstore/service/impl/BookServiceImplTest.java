@@ -11,14 +11,15 @@ import com.my.bookstore.model.enums.Language;
 import com.my.bookstore.repo.BookRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,14 +30,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class BookServiceImplTest {
 
-    @MockitoBean
+    @Mock
     BookRepository bookRepository;
-    @MockitoBean ModelMapper modelMapper;
+    @Mock ModelMapper modelMapper;
 
-    @Autowired
+    @InjectMocks
     BookServiceImpl bookService;
 
     private Book book;
@@ -149,11 +150,17 @@ class BookServiceImplTest {
         BookPatchDTO patchDTO = new BookPatchDTO();
         patchDTO.setAuthor("New Author");
         patchDTO.setStock(5);
-        // name is null — should stay unchanged
 
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
         when(bookRepository.save(book)).thenReturn(book);
         when(modelMapper.map(book, BookResponseDTO.class)).thenReturn(responseDTO);
+
+        doAnswer(invocation -> {
+            Book target = invocation.getArgument(1);
+            target.setAuthor("New Author");
+            target.setStock(5);
+            return null;
+        }).when(modelMapper).map(any(BookPatchDTO.class), any(Book.class));
 
         bookService.patchBookById(1L, patchDTO);
 

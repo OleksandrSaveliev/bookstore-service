@@ -1,6 +1,7 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.employee.EmployeeDTO;
+import com.my.bookstore.dto.auth.UserResponseDTO;
+import com.my.bookstore.dto.employee.EmployeeRequestDTO;
 import com.my.bookstore.dto.employee.EmployeePatchDTO;
 import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.exception.AlreadyExistException;
@@ -12,6 +13,7 @@ import com.my.bookstore.repo.EmployeeProfileRepository;
 import com.my.bookstore.repo.UserRepository;
 import com.my.bookstore.service.AdminService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
@@ -42,9 +45,21 @@ public class AdminServiceImpl implements AdminService {
         return modelMapper.map(profile, EmployeeResponseDTO.class);
     }
 
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> {
+                    var dto = modelMapper.map(user, UserResponseDTO.class);
+                    if (user.getRole() != null) {
+                        dto.setRoles(List.of(user.getRole().name()));
+                    }
+                    return dto;
+                })
+                .toList();
+    }
+
     @Override
     @Transactional
-    public EmployeeResponseDTO addEmployee(EmployeeDTO dto) {
+    public EmployeeResponseDTO addEmployee(EmployeeRequestDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new AlreadyExistException("Email already in use: " + dto.getEmail());
         }

@@ -11,11 +11,12 @@ import com.my.bookstore.repo.ClientProfileRepository;
 import com.my.bookstore.repo.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,19 +27,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class ClientServiceImplTest {
 
-    @MockitoBean
+    @Mock
     ClientProfileRepository clientProfileRepository;
-    @MockitoBean
+    @Mock
     UserRepository userRepository;
-    @MockitoBean
+    @Mock
     ModelMapper modelMapper;
-    @MockitoBean
+    @Mock
     PasswordEncoder passwordEncoder;
 
-    @Autowired
+    @InjectMocks
     ClientServiceImpl clientService;
 
     private User user;

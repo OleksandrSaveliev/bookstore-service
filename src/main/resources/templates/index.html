@@ -24,8 +24,8 @@
             </div>
 
             <div class="guestActions">
-                <a th:href="${frontendUrl} + '/login'" class="btn btn-ghost" th:text="#{nav.login}">Login</a>
-                <a th:href="${frontendUrl} + '/signup'" class="btn btn-primary" th:text="#{nav.signup}">Join now</a>
+<!--                <a th:href="${frontendUrl} + '/login'" class="btn btn-ghost" th:text="#{nav.login}">Login</a>-->
+                <a th:href="${frontendUrl}" class="btn btn-primary" th:text="#{nav.signup}">Join now</a>
             </div>
         </div>
     </div>
@@ -45,7 +45,7 @@
                 </div>
             </div>
             <div class="heroImage">
-                <img th:src="@{/hero-image.webp}" th:alt="#{home.heroAlt}">
+                <img th:src="@{/images/hero-image.webp}" th:alt="#{home.heroAlt}">
             </div>
         </section>
 

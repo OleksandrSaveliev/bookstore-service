@@ -1,6 +1,6 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.auth.AuthResponseDTO;
+import com.my.bookstore.dto.auth.UserResponseDTO;
 import com.my.bookstore.dto.auth.LoginRequestDTO;
 import com.my.bookstore.dto.auth.SignupRequestDTO;
 import com.my.bookstore.service.AuthService;
@@ -20,14 +20,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signin")
-    public ResponseEntity<AuthResponseDTO> signin(
+    public ResponseEntity<UserResponseDTO> signin(
             @Valid @RequestBody LoginRequestDTO request,
             HttpServletResponse response) {
         return ResponseEntity.ok(authService.login(request, response));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthResponseDTO> signup(
+    public ResponseEntity<UserResponseDTO> signup(
             @Valid @RequestBody SignupRequestDTO request,
             HttpServletResponse response) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -35,7 +35,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponseDTO> refresh(
+    public ResponseEntity<UserResponseDTO> refresh(
             HttpServletRequest request,
             HttpServletResponse response) {
         return ResponseEntity.ok(authService.refresh(request, response));

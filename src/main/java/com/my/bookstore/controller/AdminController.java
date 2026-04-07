@@ -1,6 +1,7 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.employee.EmployeeDTO;
+import com.my.bookstore.dto.auth.UserResponseDTO;
+import com.my.bookstore.dto.employee.EmployeeRequestDTO;
 import com.my.bookstore.dto.employee.EmployeePatchDTO;
 import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.service.AdminService;
@@ -19,8 +20,6 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    // --- Employee management ---
-
     @GetMapping("/employees")
     public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees() {
         return ResponseEntity.ok(adminService.getAllEmployees());
@@ -31,9 +30,14 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getEmployeeById(id));
     }
 
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        return ResponseEntity.ok(adminService.getAllUsers());
+    }
+
     @PostMapping("/employees")
     public ResponseEntity<EmployeeResponseDTO> createEmployee(
-            @Valid @RequestBody EmployeeDTO dto) {
+            @Valid @RequestBody EmployeeRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(adminService.addEmployee(dto));
     }
@@ -50,8 +54,6 @@ public class AdminController {
         adminService.deleteEmployee(id);
         return ResponseEntity.noContent().build();
     }
-
-    // --- Role management ---
 
     @PatchMapping("/users/{id}/role")
     public ResponseEntity<Void> changeUserRole(

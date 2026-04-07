@@ -1,6 +1,7 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.employee.EmployeeDTO;
+import com.my.bookstore.dto.auth.UserResponseDTO;
+import com.my.bookstore.dto.employee.EmployeeRequestDTO;
 import com.my.bookstore.dto.employee.EmployeePatchDTO;
 import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.exception.AlreadyExistException;
@@ -48,7 +49,6 @@ class AdminServiceImplTest {
 
     @BeforeEach
     void setUp() {
-
         user = new User();
         user.setId(1L);
         user.setEmail("emp@test.com");
@@ -67,6 +67,43 @@ class AdminServiceImplTest {
         responseDTO.setName("John");
     }
 
+    // --- getAllUsers ---
+
+    @Test
+    void getAllUsers_returnsListOfDTOsWithRolesList() {
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setEmail("client@test.com");
+        user2.setRole(Role.CLIENT);
+
+        UserResponseDTO userDto1 = new UserResponseDTO();
+        userDto1.setId(1L);
+        userDto1.setEmail("emp@test.com");
+
+        UserResponseDTO userDto2 = new UserResponseDTO();
+        userDto2.setId(2L);
+        userDto2.setEmail("client@test.com");
+
+        when(userRepository.findAll()).thenReturn(List.of(user, user2));
+        when(modelMapper.map(user, UserResponseDTO.class)).thenReturn(userDto1);
+        when(modelMapper.map(user2, UserResponseDTO.class)).thenReturn(userDto2);
+
+        List<UserResponseDTO> result = adminService.getAllUsers();
+
+        assertThat(result).hasSize(2);
+
+        assertThat(result.get(0).getRoles()).containsExactly("EMPLOYEE");
+        assertThat(result.get(1).getRoles()).containsExactly("CLIENT");
+
+        verify(userRepository, times(1)).findAll();
+    }
+
+    @Test
+    void getAllUsers_empty_returnsEmptyList() {
+        when(userRepository.findAll()).thenReturn(List.of());
+        assertThat(adminService.getAllUsers()).isEmpty();
+    }
+
     // --- getAllEmployees ---
 
     @Test
@@ -83,7 +120,6 @@ class AdminServiceImplTest {
     @Test
     void getAllEmployees_emptyRepo_returnsEmptyList() {
         when(employeeProfileRepository.findAll()).thenReturn(List.of());
-
         assertThat(adminService.getAllEmployees()).isEmpty();
     }
 
@@ -112,7 +148,7 @@ class AdminServiceImplTest {
 
     @Test
     void addEmployee_success_savesUserAndProfile() {
-        EmployeeDTO dto = new EmployeeDTO();
+        EmployeeRequestDTO dto = new EmployeeRequestDTO();
         dto.setEmail("new@test.com");
         dto.setPassword("pass");
 
@@ -132,7 +168,7 @@ class AdminServiceImplTest {
 
     @Test
     void addEmployee_duplicateEmail_throwsAlreadyExistException() {
-        EmployeeDTO dto = new EmployeeDTO();
+        EmployeeRequestDTO dto = new EmployeeRequestDTO();
         dto.setEmail("emp@test.com");
 
         when(userRepository.existsByEmail("emp@test.com")).thenReturn(true);
@@ -170,7 +206,7 @@ class AdminServiceImplTest {
     @Test
     void patchEmployee_sameEmail_doesNotCheckDuplicate() {
         EmployeePatchDTO patchDTO = new EmployeePatchDTO();
-        patchDTO.setEmail("emp@test.com"); // same as existing
+        patchDTO.setEmail("emp@test.com");
 
         doNothing().when(modelMapper).map(patchDTO, profile);
 

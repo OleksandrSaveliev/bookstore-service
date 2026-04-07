@@ -1,6 +1,6 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.auth.AuthResponseDTO;
+import com.my.bookstore.dto.auth.UserResponseDTO;
 import com.my.bookstore.dto.auth.LoginRequestDTO;
 import com.my.bookstore.dto.auth.SignupRequestDTO;
 import com.my.bookstore.exception.AlreadyExistException;
@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
     private static final int REFRESH_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
     @Override
-    public AuthResponseDTO login(LoginRequestDTO request, HttpServletResponse response) {
+    public UserResponseDTO login(LoginRequestDTO request, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
@@ -76,12 +76,12 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User not found: " + email));
 
-        return new AuthResponseDTO(user.getId(), user.getEmail(), roles);
+        return new UserResponseDTO(user.getId(), user.getEmail(), roles);
     }
 
     @Override
     @Transactional
-    public AuthResponseDTO signup(SignupRequestDTO request, HttpServletResponse response) {
+    public UserResponseDTO signup(SignupRequestDTO request, HttpServletResponse response) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new AlreadyExistException("Email already in use: " + request.getEmail());
         }
@@ -101,11 +101,11 @@ public class AuthServiceImpl implements AuthService {
         addAccessCookie(response, jwtUtils.generateToken(savedUser.getEmail()));
         addRefreshCookie(response, jwtUtils.generateRefreshToken(savedUser.getEmail()));
 
-        return new AuthResponseDTO(savedUser.getId(), savedUser.getEmail(), List.of("ROLE_CLIENT"));
+        return new UserResponseDTO(savedUser.getId(), savedUser.getEmail(), List.of("ROLE_CLIENT"));
     }
 
     @Override
-    public AuthResponseDTO refresh(HttpServletRequest request, HttpServletResponse response) {
+    public UserResponseDTO refresh(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = null;
         if (request.getCookies() != null) {
             refreshToken = Arrays.stream(request.getCookies())
@@ -132,7 +132,7 @@ public class AuthServiceImpl implements AuthService {
                 .toList();
 
         log.info("Access token refreshed for: {}", email);
-        return new AuthResponseDTO(user.getId(), user.getEmail(), roles);
+        return new UserResponseDTO(user.getId(), user.getEmail(), roles);
     }
 
     @Override

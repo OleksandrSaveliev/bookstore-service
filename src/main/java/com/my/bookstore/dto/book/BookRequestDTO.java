@@ -14,37 +14,37 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class BookRequestDTO {
 
-    @NotBlank
+    @NotBlank(message = "{book.name.required}")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "{book.genre.required}")
     private String genre;
 
-    @NotNull
+    @NotNull(message = "{book.ageGroup.required}")
     private AgeGroup ageGroup;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "{book.price.required}")
+    @Positive(message = "{book.price.positive}")
     private BigDecimal price;
 
-    @NotNull
-    @PastOrPresent
+    @NotNull(message = "{book.publicationDate.required}")
+    @PastOrPresent(message = "{book.publicationDate.invalid}")
     private LocalDate publicationDate;
 
-    @NotBlank
+    @NotBlank(message = "{book.author.required}")
     private String author;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "{book.pages.required}")
+    @Positive(message = "{book.pages.positive}")
     private Integer pages;
 
-    @NotNull
-    @PositiveOrZero
+    @NotNull(message = "{book.stock.required}")
+    @PositiveOrZero(message = "{book.stock.negative}")
     private Integer stock;
 
     private String characteristics;
     private String description;
 
-    @NotNull
+    @NotNull(message = "{book.language.required}")
     private Language language;
 }

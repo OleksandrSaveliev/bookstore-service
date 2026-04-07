@@ -14,19 +14,19 @@ import com.my.bookstore.model.enums.OrderStatus;
 import com.my.bookstore.repo.BookRepository;
 import com.my.bookstore.repo.ClientProfileRepository;
 import com.my.bookstore.repo.OrderRepository;
-import com.my.bookstore.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,19 +38,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
 
-    @MockitoBean
+    @Mock
     OrderRepository orderRepository;
-    @MockitoBean
+    @Mock
     ClientProfileRepository clientProfileRepository;
-    @MockitoBean
+    @Mock
     BookRepository bookRepository;
-    @MockitoBean
+    @Mock
     ModelMapper modelMapper;
 
-    @Autowired
+    @InjectMocks
     OrderServiceImpl orderService;
 
     private Order order;

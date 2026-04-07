@@ -1,6 +1,6 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.auth.AuthResponseDTO;
+import com.my.bookstore.dto.auth.UserResponseDTO;
 import com.my.bookstore.dto.auth.LoginRequestDTO;
 import com.my.bookstore.dto.auth.SignupRequestDTO;
 import com.my.bookstore.exception.AlreadyExistException;
@@ -94,7 +94,7 @@ class AuthServiceImplTest {
         when(jwtUtils.generateRefreshToken("user@test.com")).thenReturn("refresh");
         when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.of(user));
 
-        AuthResponseDTO result = authService.login(dto, response);
+        UserResponseDTO result = authService.login(dto, response);
 
         assertThat(result.getEmail()).isEqualTo("user@test.com");
         assertThat(result.getRoles()).contains("ROLE_CLIENT");
@@ -138,7 +138,7 @@ class AuthServiceImplTest {
         when(jwtUtils.generateToken(anyString())).thenReturn("access");
         when(jwtUtils.generateRefreshToken(anyString())).thenReturn("refresh");
 
-        AuthResponseDTO result = authService.signup(dto, response);
+        UserResponseDTO result = authService.signup(dto, response);
 
         assertThat(result).isNotNull();
         verify(clientProfileRepository).save(any(ClientProfile.class));
@@ -177,7 +177,7 @@ class AuthServiceImplTest {
         when(userDetailsService.loadUserByUsername("user@test.com")).thenReturn(userDetails);
         when(jwtUtils.generateToken("user@test.com")).thenReturn("new_access");
 
-        AuthResponseDTO result = authService.refresh(request, response);
+        UserResponseDTO result = authService.refresh(request, response);
 
         assertThat(result.getEmail()).isEqualTo("user@test.com");
         verify(response).addHeader(eq("Set-Cookie"), anyString());

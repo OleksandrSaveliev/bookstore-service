@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthResponseDTO {
+public class UserResponseDTO {
     private Long id;
     private String email;
     private List<String> roles;
