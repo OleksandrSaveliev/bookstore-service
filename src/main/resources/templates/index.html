@@ -2,87 +2,106 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>BookStore</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookStore | Home</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="icon" href="data:,">
 </head>
 <body>
 
-<div class="container">
+<header class="header">
+    <div class="container header-inner">
+        <a th:href="${frontendUrl} + '/'" class="logo">
+            📚 <span class="logoText">BookStore</span>
+        </a>
 
-    <!-- HEADER -->
-    <header class="header">
-        <div class="logo">📚 BookStore</div>
+        <div class="navActions">
+            <div class="langSwitch">
+                <a th:href="@{/(lang='en')}" class="langBtn"
+                   th:classappend="${#locale.language == 'en'} ? 'activeLang' : ''">EN</a>
+                <a th:href="@{/(lang='ua')}" class="langBtn"
+                   th:classappend="${#locale.language == 'ua'} ? 'activeLang' : ''">UA</a>
+            </div>
 
-        <div class="nav-actions">
-            <!-- Language switcher -->
-            <a th:href="@{/(lang=en)}" class="btn ghost">EN</a>
-            <a th:href="@{/(lang=ua)}" class="btn ghost">UA</a>
-
-            <a th:href="@{/login}" class="btn ghost" th:text="#{nav.login}">Login</a>
-            <a th:href="@{/app}" class="btn primary" th:text="#{nav.openApp}">Open App</a>
-        </div>
-    </header>
-
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1 th:text="#{home.headline}">Discover Your Next Favorite Book</h1>
-            <p class="subtitle" th:text="#{home.subtitle}">
-                Modern bookstore experience powered by Spring Boot & React.
-            </p>
-            <div class="actions">
-                <a th:href="@{/app}" class="btn primary" th:text="#{home.startExploring}">Start Exploring</a>
-                <a th:href="@{/api/v1/books}" class="btn ghost">API</a>
+            <div class="guestActions">
+                <a th:href="${frontendUrl} + '/login'" class="btn btn-ghost" th:text="#{nav.login}">Login</a>
+                <a th:href="${frontendUrl} + '/signup'" class="btn btn-primary" th:text="#{nav.signup}">Join now</a>
             </div>
         </div>
-        <div class="hero-image">
-            <img src="/images/hero-image.webp" th:alt="#{home.heroAlt}">
-        </div>
-    </section>
+    </div>
+</header>
 
-    <!-- BOOKS -->
-    <section class="books">
+<main>
+    <div class="container fade-in">
+        <section class="hero">
+            <div class="heroContent">
+                <h1 th:utext="#{home.headline}">Discover Your Next Favorite Book</h1>
+                <p class="subtitle" th:text="#{home.subtitle}">
+                    Explore our collection of books and find your next great read.
+                </p>
+                <div style="display: flex; gap: 12px;">
+                    <a th:href="${frontendUrl} + '/catalog'" class="btn btn-primary"
+                       th:text="#{home.startExploring}">Start Exploring</a>
+                </div>
+            </div>
+            <div class="heroImage">
+                <img th:src="@{/hero-image.webp}" th:alt="#{home.heroAlt}">
+            </div>
+        </section>
 
-        <h2 th:text="#{home.featured}">Featured Books</h2>
+        <section>
+            <h2 class="sectionTitle" th:text="#{home.featured}">Featured Books</h2>
 
-        <div class="grid">
-            <a th:each="book : ${books}"
-               th:href="@{/app/books/{name}(name=${book.name})}"
-               class="card">
-                <h3 th:text="${book.name}">Book Name</h3>
-                <p class="author" th:text="${book.author}">Author</p>
-                <p class="price" th:text="'$' + ${book.price}">$10</p>
-            </a>
-        </div>
+            <div class="grid">
+                <a th:each="book : ${books}"
+                   th:href="${frontendUrl} + '/app/books/' + ${book.id}"
+                   class="book-card-link">
 
-        <!-- PAGINATION -->
-        <div class="pagination">
-            <a th:if="${currentPage > 0}"
-               th:href="@{/(page=${currentPage - 1}, size=${size})}"
-               class="btn ghost"
-               th:text="#{home.prev}">← Prev</a>
+                    <div class="book-card">
+                        <div class="book-card-info">
+                            <h3 th:text="${book.name}">Book Title</h3>
+                            <p class="book-author" th:text="${book.author}">Author Name</p>
 
-            <span class="page-info">
-                <span th:text="#{home.page}">Page</span>
-                <span th:text="${currentPage + 1}">1</span>
-                <span th:text="#{home.of}">of</span>
-                <span th:text="${totalPages}">1</span>
-            </span>
+                            <p class="book-genre" th:if="${book.genre != null}" th:text="${book.genre}">Genre</p>
 
-            <a th:if="${currentPage < totalPages - 1}"
-               th:href="@{/(page=${currentPage + 1}, size=${size})}"
-               class="btn ghost"
-               th:text="#{home.next}">Next →</a>
-        </div>
+                            <p class="book-price">
+                                <span th:text="${book.price}">0.00</span> USD
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
 
-    </section>
+            <div class="pagination" th:if="${totalPages > 1}">
+                <a th:href="@{/(page=${currentPage - 1})}"
+                   class="btn btn-ghost"
+                   th:classappend="${currentPage == 0} ? 'disabled-link' : ''"
+                   th:text="#{home.prev}">← Prev</a>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <p>© 2026 BookStore</p>
-    </footer>
+                <span class="page-info">
+                    <span th:text="#{home.page}">Page</span>
+                    <span th:text="${currentPage + 1}">1</span>
+                    <span th:text="#{home.of}">of</span>
+                    <span th:text="${totalPages}">1</span>
+                </span>
 
-</div>
+                <a th:href="@{/(page=${currentPage + 1})}"
+                   class="btn btn-ghost"
+                   th:classappend="${currentPage + 1 >= totalPages} ? 'disabled-link' : ''"
+                   th:text="#{home.next}">Next →</a>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="footer">
+    <p class="copyright">© 2026 BookStore Project</p>
+    <div class="links">
+        <a href="https://github.com" class="link">GitHub</a>
+        <a th:href="@{/api/v1/books}" class="link">API Docs</a>
+        <span class="link">EPAM Final Project</span>
+    </div>
+</footer>
 
 </body>
 </html>

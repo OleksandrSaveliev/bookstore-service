@@ -1,4 +1,4 @@
-package com.my.bookstore.service;
+package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.client.ClientPatchDTO;
 import com.my.bookstore.dto.client.ClientResponseDTO;
@@ -9,33 +9,36 @@ import com.my.bookstore.model.User;
 import com.my.bookstore.model.enums.Role;
 import com.my.bookstore.repo.ClientProfileRepository;
 import com.my.bookstore.repo.UserRepository;
-import com.my.bookstore.service.impl.ClientServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class ClientServiceImplTest {
 
-    @Mock ClientProfileRepository clientProfileRepository;
-    @Mock UserRepository userRepository;
-    @Mock ModelMapper modelMapper;
-    @Mock PasswordEncoder passwordEncoder;
+    @MockitoBean
+    ClientProfileRepository clientProfileRepository;
+    @MockitoBean
+    UserRepository userRepository;
+    @MockitoBean
+    ModelMapper modelMapper;
+    @MockitoBean
+    PasswordEncoder passwordEncoder;
 
-    @InjectMocks
+    @Autowired
     ClientServiceImpl clientService;
 
     private User user;

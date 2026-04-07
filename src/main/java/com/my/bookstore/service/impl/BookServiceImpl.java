@@ -70,39 +70,7 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Book not found: " + id));
 
-        if (patchDTO.getName() != null && !patchDTO.getName().isBlank()) {
-            book.setName(patchDTO.getName());
-        }
-        if (patchDTO.getGenre() != null && !patchDTO.getGenre().isBlank()) {
-            book.setGenre(patchDTO.getGenre());
-        }
-        if (patchDTO.getAgeGroup() != null) {
-            book.setAgeGroup(patchDTO.getAgeGroup());
-        }
-        if (patchDTO.getPrice() != null) {
-            book.setPrice(patchDTO.getPrice());
-        }
-        if (patchDTO.getPublicationDate() != null) {
-            book.setPublicationDate(patchDTO.getPublicationDate());
-        }
-        if (patchDTO.getAuthor() != null && !patchDTO.getAuthor().isBlank()) {
-            book.setAuthor(patchDTO.getAuthor());
-        }
-        if (patchDTO.getPages() != null) {
-            book.setPages(patchDTO.getPages());
-        }
-        if (patchDTO.getStock() != null) {
-            book.setStock(patchDTO.getStock());
-        }
-        if (patchDTO.getCharacteristics() != null) {
-            book.setCharacteristics(patchDTO.getCharacteristics());
-        }
-        if (patchDTO.getDescription() != null) {
-            book.setDescription(patchDTO.getDescription());
-        }
-        if (patchDTO.getLanguage() != null) {
-            book.setLanguage(patchDTO.getLanguage());
-        }
+        modelMapper.map(patchDTO, book);
 
         return modelMapper.map(bookRepository.save(book), BookResponseDTO.class);
     }

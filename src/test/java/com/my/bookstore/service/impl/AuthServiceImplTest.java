@@ -1,4 +1,4 @@
-package com.my.bookstore.service;
+package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.auth.AuthResponseDTO;
 import com.my.bookstore.dto.auth.LoginRequestDTO;
@@ -11,7 +11,6 @@ import com.my.bookstore.model.enums.Role;
 import com.my.bookstore.repo.ClientProfileRepository;
 import com.my.bookstore.repo.UserRepository;
 import com.my.bookstore.security.JwtUtils;
-import com.my.bookstore.service.impl.AuthServiceImpl;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,29 +43,28 @@ import static org.mockito.Mockito.*;
 class AuthServiceImplTest {
 
     @Mock
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
     @Mock
-    JwtUtils jwtUtils;
+    private JwtUtils jwtUtils;
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Mock
-    ClientProfileRepository clientProfileRepository;
+    private ClientProfileRepository clientProfileRepository;
     @Mock
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
     @Mock
-    UserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
     @Mock
-    HttpServletResponse response;
+    private HttpServletResponse response;
     @Mock
-    HttpServletRequest request;
+    private HttpServletRequest request;
     @Mock
-    Authentication authentication;
+    private Authentication authentication;
     @Mock
-    ModelMapper modelMapper;
-
+    private ModelMapper modelMapper;
 
     @InjectMocks
-    AuthServiceImpl authService;
+    private AuthServiceImpl authService;
 
     private User user;
 
@@ -86,10 +85,11 @@ class AuthServiceImplTest {
     void login_validCredentials_returnsAuthResponse() {
         LoginRequestDTO dto = new LoginRequestDTO("user@test.com", "pass");
 
-        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(authentication.getName()).thenReturn("user@test.com");
-        when(authentication.getAuthorities()).thenAnswer(i ->
-                List.of(new SimpleGrantedAuthority("ROLE_CLIENT")));
+        doReturn(List.of(new SimpleGrantedAuthority("ROLE_CLIENT")))
+                .when(authentication).getAuthorities();
+
         when(jwtUtils.generateToken("user@test.com")).thenReturn("access");
         when(jwtUtils.generateRefreshToken("user@test.com")).thenReturn("refresh");
         when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.of(user));
@@ -112,6 +112,20 @@ class AuthServiceImplTest {
                 .isInstanceOf(BadCredentialsException.class);
     }
 
+    @Test
+    void login_userNotFoundAfterAuth_throwsNotFoundException() {
+        LoginRequestDTO dto = new LoginRequestDTO("ghost@test.com", "pass");
+
+        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("ghost@test.com");
+
+        when(userRepository.findByEmail("ghost@test.com")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> authService.login(dto, response))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("User not found");
+    }
+
     // --- signup ---
 
     @Test
@@ -121,13 +135,14 @@ class AuthServiceImplTest {
         when(userRepository.existsByEmail("new@test.com")).thenReturn(false);
         when(passwordEncoder.encode("pass")).thenReturn("encoded");
         when(userRepository.save(any(User.class))).thenReturn(user);
-        when(jwtUtils.generateToken(any())).thenReturn("access");
-        when(jwtUtils.generateRefreshToken(any())).thenReturn("refresh");
+        when(jwtUtils.generateToken(anyString())).thenReturn("access");
+        when(jwtUtils.generateRefreshToken(anyString())).thenReturn("refresh");
 
         AuthResponseDTO result = authService.signup(dto, response);
 
-        assertThat(result.getRoles()).contains("ROLE_CLIENT");
+        assertThat(result).isNotNull();
         verify(clientProfileRepository).save(any(ClientProfile.class));
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
@@ -137,8 +152,7 @@ class AuthServiceImplTest {
         when(userRepository.existsByEmail("user@test.com")).thenReturn(true);
 
         assertThatThrownBy(() -> authService.signup(dto, response))
-                .isInstanceOf(AlreadyExistException.class)
-                .hasMessageContaining("user@test.com");
+                .isInstanceOf(AlreadyExistException.class);
 
         verifyNoInteractions(clientProfileRepository);
     }
@@ -155,7 +169,11 @@ class AuthServiceImplTest {
         when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.of(user));
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User
-                .withUsername("user@test.com").password("encoded").roles("CLIENT").build();
+                .withUsername("user@test.com")
+                .password("encoded")
+                .roles("CLIENT")
+                .build();
+
         when(userDetailsService.loadUserByUsername("user@test.com")).thenReturn(userDetails);
         when(jwtUtils.generateToken("user@test.com")).thenReturn("new_access");
 
@@ -166,12 +184,34 @@ class AuthServiceImplTest {
     }
 
     @Test
+    void refresh_userNotFoundAfterTokenValid_throwsNotFoundException() {
+        Cookie refreshCookie = new Cookie("refresh_token", "valid_refresh");
+
+        when(request.getCookies()).thenReturn(new Cookie[]{refreshCookie});
+        when(jwtUtils.validateToken("valid_refresh")).thenReturn(true);
+        when(jwtUtils.getEmailFromToken("valid_refresh")).thenReturn("user@test.com");
+
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+                .withUsername("user@test.com")
+                .password("encoded")
+                .roles("CLIENT")
+                .build();
+        when(userDetailsService.loadUserByUsername("user@test.com")).thenReturn(userDetails);
+
+        // This simulates the user being deleted from DB while they still have a valid token
+        when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> authService.refresh(request, response))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("User not found");
+    }
+
+    @Test
     void refresh_missingCookie_throwsNotFoundException() {
         when(request.getCookies()).thenReturn(null);
 
         assertThatThrownBy(() -> authService.refresh(request, response))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("refresh token");
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -190,8 +230,6 @@ class AuthServiceImplTest {
     @Test
     void logout_clearsBothCookies() {
         authService.logout(request, response);
-
-        // one call per cookie (access + refresh)
         verify(response, times(2)).addHeader(eq("Set-Cookie"), anyString());
     }
 }

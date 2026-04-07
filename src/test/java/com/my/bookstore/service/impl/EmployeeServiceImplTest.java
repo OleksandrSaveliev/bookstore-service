@@ -1,4 +1,4 @@
-package com.my.bookstore.service;
+package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.exception.NotFoundException;
@@ -6,30 +6,29 @@ import com.my.bookstore.model.EmployeeProfile;
 import com.my.bookstore.model.User;
 import com.my.bookstore.model.enums.Role;
 import com.my.bookstore.repo.EmployeeProfileRepository;
-import com.my.bookstore.service.impl.EmployeeServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class EmployeeServiceImplTest {
 
-    @Mock
+    @MockitoBean
     EmployeeProfileRepository employeeProfileRepository;
-    @Mock
+    @MockitoBean
     ModelMapper modelMapper;
 
-    @InjectMocks
+    @Autowired
     EmployeeServiceImpl employeeService;
 
     private EmployeeProfile profile;

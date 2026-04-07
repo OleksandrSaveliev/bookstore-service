@@ -81,7 +81,7 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/", "/api/v1/auth/**",
-                                "/css/**", "/js/**", "/images/**", "/h2-console/**"
+                                "/css/**", "/js/**", "/images/**", "/h2-console/**","/error","/favicon.ico"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.GET,    "/api/v1/books/**").permitAll()

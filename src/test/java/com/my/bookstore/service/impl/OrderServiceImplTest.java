@@ -1,4 +1,4 @@
-package com.my.bookstore.service;
+package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.order.OrderItemRequestDTO;
 import com.my.bookstore.dto.order.OrderRequestDTO;
@@ -6,7 +6,10 @@ import com.my.bookstore.dto.order.OrderResponseDTO;
 import com.my.bookstore.exception.LowBalanceException;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.exception.OutOfStockException;
-import com.my.bookstore.model.*;
+import com.my.bookstore.model.Book;
+import com.my.bookstore.model.ClientProfile;
+import com.my.bookstore.model.Order;
+import com.my.bookstore.model.User;
 import com.my.bookstore.model.enums.OrderStatus;
 import com.my.bookstore.repo.BookRepository;
 import com.my.bookstore.repo.ClientProfileRepository;
@@ -15,32 +18,39 @@ import com.my.bookstore.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class OrderServiceImplTest {
 
-    @Mock OrderRepository orderRepository;
-    @Mock ClientProfileRepository clientProfileRepository;
-    @Mock BookRepository bookRepository;
-    @Mock ModelMapper modelMapper;
+    @MockitoBean
+    OrderRepository orderRepository;
+    @MockitoBean
+    ClientProfileRepository clientProfileRepository;
+    @MockitoBean
+    BookRepository bookRepository;
+    @MockitoBean
+    ModelMapper modelMapper;
 
-    @InjectMocks
+    @Autowired
     OrderServiceImpl orderService;
 
     private Order order;

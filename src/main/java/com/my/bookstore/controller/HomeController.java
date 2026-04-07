@@ -21,7 +21,7 @@ public class HomeController {
     @GetMapping
     public String home(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "9") int size,
             Model model
     ) {
 
@@ -30,6 +30,7 @@ public class HomeController {
         model.addAttribute("currentPage", booksPage.getNumber());
         model.addAttribute("totalPages", booksPage.getTotalPages());
         model.addAttribute("size", size);
+        model.addAttribute("frontendUrl", "http://localhost:5173");
 
         return "index";
     }

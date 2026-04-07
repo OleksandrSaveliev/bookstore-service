@@ -1,4 +1,4 @@
-package com.my.bookstore.service;
+package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.employee.EmployeeDTO;
 import com.my.bookstore.dto.employee.EmployeePatchDTO;
@@ -10,7 +10,6 @@ import com.my.bookstore.model.User;
 import com.my.bookstore.model.enums.Role;
 import com.my.bookstore.repo.EmployeeProfileRepository;
 import com.my.bookstore.repo.UserRepository;
-import com.my.bookstore.service.impl.AdminServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +22,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,6 +48,7 @@ class AdminServiceImplTest {
 
     @BeforeEach
     void setUp() {
+
         user = new User();
         user.setId(1L);
         user.setEmail("emp@test.com");

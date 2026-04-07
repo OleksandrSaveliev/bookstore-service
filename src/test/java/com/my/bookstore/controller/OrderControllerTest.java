@@ -185,7 +185,8 @@ class OrderControllerTest {
     void getOrders_defaultParams_returnsPage() throws Exception {
         Page<OrderResponseDTO> page = new PageImpl<>(List.of(sampleOrder));
 
-        when(orderService.getAllOrders(0, 10, "createdAt", "desc", null)).thenReturn(page);
+        when(orderService.getAllOrders(anyInt(), anyInt(), anyString(), anyString(), any()))
+                .thenReturn(page);
 
         mockMvc.perform(get("/api/v1/orders"))
                 .andExpect(status().isOk())

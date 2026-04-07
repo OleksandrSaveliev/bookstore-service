@@ -1,4 +1,4 @@
-package com.my.bookstore.service;
+package com.my.bookstore.service.impl;
 
 import com.my.bookstore.dto.book.BookPatchDTO;
 import com.my.bookstore.dto.book.BookRequestDTO;
@@ -9,32 +9,34 @@ import com.my.bookstore.model.Book;
 import com.my.bookstore.model.enums.AgeGroup;
 import com.my.bookstore.model.enums.Language;
 import com.my.bookstore.repo.BookRepository;
-import com.my.bookstore.service.impl.BookServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class BookServiceImplTest {
 
-    @Mock BookRepository bookRepository;
-    @Mock ModelMapper modelMapper;
+    @MockitoBean
+    BookRepository bookRepository;
+    @MockitoBean ModelMapper modelMapper;
 
-    @InjectMocks
+    @Autowired
     BookServiceImpl bookService;
 
     private Book book;
