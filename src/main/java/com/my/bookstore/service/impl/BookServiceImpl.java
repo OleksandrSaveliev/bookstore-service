@@ -70,6 +70,8 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Book not found: " + id));
 
+
+
         modelMapper.map(patchDTO, book);
 
         return modelMapper.map(bookRepository.save(book), BookResponseDTO.class);
