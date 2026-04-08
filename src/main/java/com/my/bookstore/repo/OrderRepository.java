@@ -12,9 +12,6 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @EntityGraph(attributePaths = {"client", "client.user", "bookItems", "bookItems.book"})
-    List<Order> findAll();
-
-    @EntityGraph(attributePaths = {"client", "client.user", "bookItems", "bookItems.book"})
     Page<Order> findAll(Pageable pageable);
 
     @EntityGraph(attributePaths = {"client", "client.user", "bookItems", "bookItems.book"})
@@ -22,8 +19,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findAllByClientUserId(@Param("userId") Long userId);
 
     @EntityGraph(attributePaths = {"client", "client.user", "bookItems", "bookItems.book"})
-    @Query(value = "SELECT o FROM Order o WHERE o.client.user.id = :userId",
-            countQuery = "SELECT count(o) FROM Order o WHERE o.client.user.id = :userId")
+    @Query(value = "SELECT o FROM Order o WHERE o.client.user.id = :userId")
     Page<Order> findAllByClientUserId(@Param("userId") Long userId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"client", "client.user", "bookItems", "bookItems.book"})

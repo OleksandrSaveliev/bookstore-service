@@ -1,6 +1,7 @@
 HELP.md
 .env
 .logs
+client_secret_oauth2.json
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
