@@ -1,10 +1,9 @@
 package com.my.bookstore.security;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -13,7 +12,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.my.bookstore.service.AuthService;
 
-import java.io.IOException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -21,22 +23,22 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     private final AuthService authService;
 
-    @Value("${app.frontend.base-url:http://localhost:5173}")
+    @Value("${app.frontend.base-url}")
     private String frontendBaseUrl;
 
-    @Value("${app.frontend.oauth2-callback-path:/oauth-callback}")
+    @Value("${app.frontend.oauth2-callback-path}")
     private String oauthCallbackPath;
 
-    @Value("${app.frontend.login-path:/login}")
+    @Value("${app.frontend.login-path}")
     private String loginPath;
 
-    public OAuth2LoginSuccessHandler(AuthService authService) {
+    public OAuth2LoginSuccessHandler(@Lazy AuthService authService) {
         this.authService = authService;
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
+            Authentication authentication) throws IOException, ServletException {
 
         if (!(authentication.getPrincipal() instanceof OAuth2User principal)) {
             log.error("OAuth2 login succeeded but principal is {}", authentication.getPrincipal().getClass().getName());
