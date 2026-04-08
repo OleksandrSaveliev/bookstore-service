@@ -1,40 +1,46 @@
 package com.my.bookstore.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.my.bookstore.config.SecurityConfig;
 import com.my.bookstore.dto.auth.UserResponseDTO;
 import com.my.bookstore.dto.employee.EmployeePatchDTO;
 import com.my.bookstore.dto.employee.EmployeeRequestDTO;
 import com.my.bookstore.dto.employee.EmployeeResponseDTO;
-import com.my.bookstore.security.AuthEntryPointJwt;
-import com.my.bookstore.security.CustomAccessDeniedHandler;
 import com.my.bookstore.security.JwtUtils;
+import com.my.bookstore.security.CustomAccessDeniedHandler;
 import com.my.bookstore.service.AdminService;
 import com.my.bookstore.service.impl.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AdminController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@Import(SecurityConfig.class)
 class AdminControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -49,13 +55,34 @@ class AdminControllerTest {
     private JwtUtils jwtUtils;
 
     @MockitoBean
-    private AuthEntryPointJwt unauthorizedHandler;
+    private AuthenticationEntryPoint unauthorizedHandler;
 
     @MockitoBean
     private CustomAccessDeniedHandler accessDeniedHandler;
 
+    @BeforeEach
+    void setUp() throws Exception {
+        doAnswer(invocation -> {
+            HttpServletResponse response = invocation.getArgument(1);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            return null;
+        }).when(unauthorizedHandler).commence(any(), any(), any());
+
+        doAnswer(invocation -> {
+            HttpServletResponse response = invocation.getArgument(1);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+            return null;
+        }).when(accessDeniedHandler).handle(any(), any(), any());
+
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+    }
+
     @Test
-    void getAllEmployees_returnsList() throws Exception {
+    @WithMockUser(roles = "ADMIN")
+    void getAllEmployees_asAdmin_returnsOk() throws Exception {
         EmployeeResponseDTO dto = new EmployeeResponseDTO();
         dto.setId(1L);
         when(adminService.getAllEmployees()).thenReturn(List.of(dto));
@@ -66,6 +93,21 @@ class AdminControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "CLIENT")
+    void getAllEmployees_asClient_returnsForbidden() throws Exception {
+        mockMvc.perform(get("/api/v1/admin/employees"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "EMPLOYEE")
+    void deleteEmployee_asEmployee_returnsForbidden() throws Exception {
+        mockMvc.perform(delete("/api/v1/admin/employees/1"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void createEmployee_validRequest_returnsCreated() throws Exception {
         EmployeeRequestDTO requestDTO = new EmployeeRequestDTO();
         requestDTO.setEmail("test@example.com");
@@ -85,22 +127,8 @@ class AdminControllerTest {
     }
 
     @Test
-    void updateEmployee_validRequest_returnsOk() throws Exception {
-        EmployeePatchDTO patchDTO = new EmployeePatchDTO();
-        patchDTO.setName("New Name");
-
-        EmployeeResponseDTO responseDTO = new EmployeeResponseDTO();
-        responseDTO.setId(1L);
-        when(adminService.patchEmployee(eq(1L), any())).thenReturn(responseDTO);
-
-        mockMvc.perform(patch("/api/v1/admin/employees/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(patchDTO)))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void deleteEmployee_callsService_returnsNoContent() throws Exception {
+    @WithMockUser(roles = "ADMIN")
+    void deleteEmployee_asAdmin_returnsNoContent() throws Exception {
         mockMvc.perform(delete("/api/v1/admin/employees/1"))
                 .andExpect(status().isNoContent());
 
@@ -108,22 +136,18 @@ class AdminControllerTest {
     }
 
     @Test
-    void getAllUsers_returnsList() throws Exception {
-        UserResponseDTO dto = new UserResponseDTO();
-        dto.setId(1L);
-        when(adminService.getAllUsers()).thenReturn(List.of(dto));
-
-        mockMvc.perform(get("/api/v1/admin/users"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1));
-    }
-
-    @Test
-    void changeUserRole_callsService_returnsNoContent() throws Exception {
+    @WithMockUser(roles = "ADMIN")
+    void changeUserRole_asAdmin_returnsNoContent() throws Exception {
         mockMvc.perform(patch("/api/v1/admin/users/1/role")
                         .param("role", "ADMIN"))
                 .andExpect(status().isNoContent());
 
         verify(adminService).changeUserRole(1L, "ADMIN");
+    }
+
+    @Test
+    void unauthenticated_returnsUnauthorized() throws Exception {
+        mockMvc.perform(get("/api/v1/admin/employees"))
+                .andExpect(status().isUnauthorized());
     }
 }

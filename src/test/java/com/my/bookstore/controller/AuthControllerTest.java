@@ -1,6 +1,7 @@
 package com.my.bookstore.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.my.bookstore.config.SecurityConfig;
 import com.my.bookstore.dto.auth.LoginRequestDTO;
 import com.my.bookstore.dto.auth.SignupRequestDTO;
 import com.my.bookstore.dto.auth.UserResponseDTO;
@@ -11,27 +12,34 @@ import com.my.bookstore.service.AuthService;
 import com.my.bookstore.service.impl.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@Import(SecurityConfig.class)
 class AuthControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -50,6 +58,26 @@ class AuthControllerTest {
 
     @MockitoBean
     private CustomAccessDeniedHandler accessDeniedHandler;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        doAnswer(invocation -> {
+            HttpServletResponse response = invocation.getArgument(1);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            return null;
+        }).when(unauthorizedHandler).commence(any(), any(), any());
+
+        doAnswer(invocation -> {
+            HttpServletResponse response = invocation.getArgument(1);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+            return null;
+        }).when(accessDeniedHandler).handle(any(), any(), any());
+
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+    }
 
     @Test
     void signin_validRequest_returnsOk() throws Exception {
@@ -106,5 +134,21 @@ class AuthControllerTest {
                 .andExpect(status().isOk());
 
         verify(authService).logout(any(HttpServletRequest.class), any(HttpServletResponse.class));
+    }
+
+    @Test
+    void signin_unauthenticated_isPermitAll_returnsOk() throws Exception {
+        UserResponseDTO response = new UserResponseDTO();
+        response.setEmail("test@example.com");
+        when(authService.login(any(LoginRequestDTO.class), any(HttpServletResponse.class))).thenReturn(response);
+
+        LoginRequestDTO request = new LoginRequestDTO();
+        request.setEmail("test@example.com");
+        request.setPassword("password");
+
+        mockMvc.perform(post("/api/v1/auth/signin")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
     }
 }
