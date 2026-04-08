@@ -13,10 +13,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BookItemDTO {
 
-    @NotNull
+    @NotNull(message = "{order.bookId.required}")
     private Long bookId;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "{order.quantity.required}")
+    @Positive(message = "{order.quantity.positive}")
     private Integer quantity;
 }

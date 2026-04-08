@@ -200,22 +200,22 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void refresh_missingCookie_throwsNotFoundException() {
+    void refresh_missingCookie_throwsBadCredentialsException() {
         when(request.getCookies()).thenReturn(null);
 
         assertThatThrownBy(() -> authService.refresh(request, response))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(BadCredentialsException.class);
     }
 
     @Test
-    void refresh_invalidToken_throwsNotFoundException() {
+    void refresh_invalidToken_throwsBadCredentialsException() {
         Cookie refreshCookie = new Cookie("refresh_token", "expired");
 
         when(request.getCookies()).thenReturn(new Cookie[]{refreshCookie});
         when(jwtUtils.validateToken("expired")).thenReturn(false);
 
         assertThatThrownBy(() -> authService.refresh(request, response))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(BadCredentialsException.class);
     }
 
     @Test

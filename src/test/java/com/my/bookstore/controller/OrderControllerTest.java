@@ -9,6 +9,7 @@ import com.my.bookstore.model.enums.OrderStatus;
 import com.my.bookstore.security.AuthEntryPointJwt;
 import com.my.bookstore.security.CustomAccessDeniedHandler;
 import com.my.bookstore.security.JwtUtils;
+import com.my.bookstore.security.OAuth2LoginSuccessHandler;
 import com.my.bookstore.service.OrderService;
 import com.my.bookstore.service.impl.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -61,6 +62,9 @@ class OrderControllerTest {
 
     @MockitoBean
     private CustomAccessDeniedHandler accessDeniedHandler;
+
+    @MockitoBean
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @BeforeEach
     void setUp() throws Exception {

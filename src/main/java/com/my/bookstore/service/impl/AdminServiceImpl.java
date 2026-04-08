@@ -1,8 +1,14 @@
 package com.my.bookstore.service.impl;
 
-import com.my.bookstore.dto.auth.UserResponseDTO;
-import com.my.bookstore.dto.employee.EmployeeRequestDTO;
+import java.util.List;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.my.bookstore.dto.employee.EmployeePatchDTO;
+import com.my.bookstore.dto.employee.EmployeeRequestDTO;
 import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.exception.AlreadyExistException;
 import com.my.bookstore.exception.NotFoundException;
@@ -12,14 +18,9 @@ import com.my.bookstore.model.enums.Role;
 import com.my.bookstore.repo.EmployeeProfileRepository;
 import com.my.bookstore.repo.UserRepository;
 import com.my.bookstore.service.AdminService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -43,18 +44,6 @@ public class AdminServiceImpl implements AdminService {
         EmployeeProfile profile = employeeProfileRepository.findByUserId(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
         return modelMapper.map(profile, EmployeeResponseDTO.class);
-    }
-
-    public List<UserResponseDTO> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(user -> {
-                    var dto = modelMapper.map(user, UserResponseDTO.class);
-                    if (user.getRole() != null) {
-                        dto.setRoles(List.of(user.getRole().name()));
-                    }
-                    return dto;
-                })
-                .toList();
     }
 
     @Override
@@ -100,23 +89,10 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void deleteEmployee(Long id) {
+    public void deleteEmployeeById(Long id) {
         EmployeeProfile profile = employeeProfileRepository.findByUserId(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
         employeeProfileRepository.delete(profile);
         userRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional
-    public void changeUserRole(Long userId, String role) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found: " + userId));
-        try {
-            user.setRole(Role.valueOf(role.toUpperCase()));
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid role: " + role);
-        }
-        userRepository.save(user);
     }
 }

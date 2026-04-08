@@ -13,15 +13,15 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class EmployeePatchDTO {
 
-    @Email
+    @Email(message = "{auth.email.invalid}")
     private String email;
 
-    @Size(min = 6)
+    @Size(min = 6, message = "{auth.password.size}")
     private String password;
 
     private String name;
     private String phone;
 
-    @Past
+    @Past(message = "{employee.birthDate.past}")
     private LocalDate birthDate;
 }

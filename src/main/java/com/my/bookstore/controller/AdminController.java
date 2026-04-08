@@ -1,10 +1,10 @@
 package com.my.bookstore.controller;
 
-import com.my.bookstore.dto.auth.UserResponseDTO;
 import com.my.bookstore.dto.employee.EmployeeRequestDTO;
 import com.my.bookstore.dto.employee.EmployeePatchDTO;
 import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.service.AdminService;
+import com.my.bookstore.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +19,7 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
+    private final UserService userService;
 
     @GetMapping("/employees")
     public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees() {
@@ -28,11 +29,6 @@ public class AdminController {
     @GetMapping("/employees/{id}")
     public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.getEmployeeById(id));
-    }
-
-    @GetMapping("/users")
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        return ResponseEntity.ok(adminService.getAllUsers());
     }
 
     @PostMapping("/employees")
@@ -51,15 +47,7 @@ public class AdminController {
 
     @DeleteMapping("/employees/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
-        adminService.deleteEmployee(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/users/{id}/role")
-    public ResponseEntity<Void> changeUserRole(
-            @PathVariable Long id,
-            @RequestParam String role) {
-        adminService.changeUserRole(id, role);
+        adminService.deleteEmployeeById(id);
         return ResponseEntity.noContent().build();
     }
 }

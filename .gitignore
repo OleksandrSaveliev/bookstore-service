@@ -1,6 +1,14 @@
 HELP.md
+
+# Local secrets & env (never commit)
 .env
-.logs
+.env.*
+!.env.example
+
+# Application logs
+logs/
+*.log
+
 client_secret_oauth2.json
 target/
 !.mvn/wrapper/maven-wrapper.jar

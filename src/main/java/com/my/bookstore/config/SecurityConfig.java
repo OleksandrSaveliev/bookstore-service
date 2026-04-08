@@ -3,6 +3,7 @@ package com.my.bookstore.config;
 import com.my.bookstore.security.AuthTokenFilter;
 import com.my.bookstore.security.CustomAccessDeniedHandler;
 import com.my.bookstore.security.JwtUtils;
+import com.my.bookstore.security.OAuth2LoginSuccessHandler;
 import com.my.bookstore.service.impl.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final JwtUtils jwtUtils;
     private final AuthenticationEntryPoint unauthorizedHandler;
     private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public AuthTokenFilter authenticationTokenFilterJwt() {
@@ -76,6 +78,10 @@ public class SecurityConfig {
                 .exceptionHandling(exception ->
                         exception.authenticationEntryPoint(unauthorizedHandler)
                                 .accessDeniedHandler(accessDeniedHandler))
+
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2LoginSuccessHandler)
+                )
 
                 .authorizeHttpRequests(auth -> auth
 

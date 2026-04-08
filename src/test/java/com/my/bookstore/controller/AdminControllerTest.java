@@ -2,13 +2,13 @@ package com.my.bookstore.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.my.bookstore.config.SecurityConfig;
-import com.my.bookstore.dto.auth.UserResponseDTO;
-import com.my.bookstore.dto.employee.EmployeePatchDTO;
 import com.my.bookstore.dto.employee.EmployeeRequestDTO;
 import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.security.JwtUtils;
+import com.my.bookstore.security.OAuth2LoginSuccessHandler;
 import com.my.bookstore.security.CustomAccessDeniedHandler;
 import com.my.bookstore.service.AdminService;
+import com.my.bookstore.service.UserService;
 import com.my.bookstore.service.impl.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +49,9 @@ class AdminControllerTest {
     private AdminService adminService;
 
     @MockitoBean
+    private UserService userService;
+
+    @MockitoBean
     private CustomUserDetailsService userDetailsService;
 
     @MockitoBean
@@ -59,6 +62,9 @@ class AdminControllerTest {
 
     @MockitoBean
     private CustomAccessDeniedHandler accessDeniedHandler;
+
+    @MockitoBean
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -132,17 +138,7 @@ class AdminControllerTest {
         mockMvc.perform(delete("/api/v1/admin/employees/1"))
                 .andExpect(status().isNoContent());
 
-        verify(adminService).deleteEmployee(1L);
-    }
-
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    void changeUserRole_asAdmin_returnsNoContent() throws Exception {
-        mockMvc.perform(patch("/api/v1/admin/users/1/role")
-                        .param("role", "ADMIN"))
-                .andExpect(status().isNoContent());
-
-        verify(adminService).changeUserRole(1L, "ADMIN");
+        verify(adminService).deleteEmployeeById(1L);
     }
 
     @Test

@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,6 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -116,7 +118,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         if (refreshToken == null || !jwtUtils.validateToken(refreshToken)) {
-            throw new NotFoundException("Invalid or missing refresh token");
+            throw new BadCredentialsException("Invalid or missing refresh token");
         }
 
         String email = jwtUtils.getEmailFromToken(refreshToken);
@@ -133,6 +135,39 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Access token refreshed for: {}", email);
         return new UserResponseDTO(user.getId(), user.getEmail(), roles);
+    }
+
+    @Override
+    @Transactional
+    public void processOAuthPostLogin(OAuth2User oauth2User, HttpServletResponse response) {
+        String email = oauth2User.getAttribute("email");
+        String name = oauth2User.getAttribute("name");
+
+        if (email == null) {
+            throw new IllegalArgumentException("Email not provided by Google");
+        }
+
+        User user = userRepository.findByEmail(email).orElseGet(() -> {
+
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setPassword("");
+            newUser.setRole(Role.CLIENT);
+            User savedUser = userRepository.save(newUser);
+
+            ClientProfile profile = new ClientProfile();
+            profile.setUser(savedUser);
+            profile.setName(name != null ? name : "Google User");
+            profile.setBalance(BigDecimal.ZERO);
+            clientProfileRepository.save(profile);
+
+            return savedUser;
+        });
+
+        addAccessCookie(response, jwtUtils.generateToken(user.getEmail()));
+        addRefreshCookie(response, jwtUtils.generateRefreshToken(user.getEmail()));
+
+        log.info("OAuth2 login successful for user: {}", email);
     }
 
     @Override

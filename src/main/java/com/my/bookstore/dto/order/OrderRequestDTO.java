@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRequestDTO {
-    @NotEmpty(message = "Order must contain at least one item")
+    @NotEmpty(message = "{order.items.notEmpty}")
     @Valid
     private List<OrderItemRequestDTO> items;
 }

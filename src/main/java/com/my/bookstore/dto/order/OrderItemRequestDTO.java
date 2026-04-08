@@ -12,10 +12,10 @@ import jakarta.validation.constraints.Positive;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItemRequestDTO {
-    @NotNull(message = "Book ID is required")
+    @NotNull(message = "{order.bookId.required}")
     private Long bookId;
 
-    @NotNull(message = "Quantity is required")
-    @Positive(message = "Quantity must be greater than 0")
+    @NotNull(message = "{order.quantity.required}")
+    @Positive(message = "{order.quantity.positive}")
     private Integer quantity;
 }

@@ -68,41 +68,6 @@ class AdminServiceImplTest {
     }
 
     @Test
-    void getAllUsers_returnsListOfDTOsWithRolesList() {
-        User user2 = new User();
-        user2.setId(2L);
-        user2.setEmail("client@test.com");
-        user2.setRole(Role.CLIENT);
-
-        UserResponseDTO userDto1 = new UserResponseDTO();
-        userDto1.setId(1L);
-        userDto1.setEmail("emp@test.com");
-
-        UserResponseDTO userDto2 = new UserResponseDTO();
-        userDto2.setId(2L);
-        userDto2.setEmail("client@test.com");
-
-        when(userRepository.findAll()).thenReturn(List.of(user, user2));
-        when(modelMapper.map(user, UserResponseDTO.class)).thenReturn(userDto1);
-        when(modelMapper.map(user2, UserResponseDTO.class)).thenReturn(userDto2);
-
-        List<UserResponseDTO> result = adminService.getAllUsers();
-
-        assertThat(result).hasSize(2);
-
-        assertThat(result.get(0).getRoles()).containsExactly("EMPLOYEE");
-        assertThat(result.get(1).getRoles()).containsExactly("CLIENT");
-
-        verify(userRepository, times(1)).findAll();
-    }
-
-    @Test
-    void getAllUsers_empty_returnsEmptyList() {
-        when(userRepository.findAll()).thenReturn(List.of());
-        assertThat(adminService.getAllUsers()).isEmpty();
-    }
-
-    @Test
     void getAllEmployees_returnsListOfDTOs() {
         when(employeeProfileRepository.findAll()).thenReturn(List.of(profile));
         when(modelMapper.map(profile, EmployeeResponseDTO.class)).thenReturn(responseDTO);
@@ -231,49 +196,22 @@ class AdminServiceImplTest {
     }
 
     @Test
-    void deleteEmployee_success_deletesProfileAndUser() {
+    void deleteEmployee_ById_success_deletesProfileAndUser() {
         when(employeeProfileRepository.findByUserId(1L)).thenReturn(Optional.of(profile));
 
-        adminService.deleteEmployee(1L);
+        adminService.deleteEmployeeById(1L);
 
         verify(employeeProfileRepository).delete(profile);
         verify(userRepository).deleteById(1L);
     }
 
     @Test
-    void deleteEmployee_notFound_throwsNotFoundException() {
+    void deleteEmployee_ById_notFound_throwsNotFoundException() {
         when(employeeProfileRepository.findByUserId(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> adminService.deleteEmployee(99L))
+        assertThatThrownBy(() -> adminService.deleteEmployeeById(99L))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository, never()).deleteById(any());
-    }
-
-    @Test
-    void changeUserRole_validRole_updatesRole() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-
-        adminService.changeUserRole(1L, "CLIENT");
-
-        assertThat(user.getRole()).isEqualTo(Role.CLIENT);
-        verify(userRepository).save(user);
-    }
-
-    @Test
-    void changeUserRole_invalidRole_throwsIllegalArgumentException() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-
-        assertThatThrownBy(() -> adminService.changeUserRole(1L, "SUPERUSER"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("SUPERUSER");
-    }
-
-    @Test
-    void changeUserRole_userNotFound_throwsNotFoundException() {
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> adminService.changeUserRole(99L, "EMPLOYEE"))
-                .isInstanceOf(NotFoundException.class);
     }
 }

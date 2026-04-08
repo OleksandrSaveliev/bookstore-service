@@ -13,14 +13,14 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class ClientPatchDTO {
 
-    @Email
+    @Email(message = "{auth.email.invalid}")
     private String email;
 
-    @Size(min = 6)
+    @Size(min = 6, message = "{auth.password.size}")
     private String password;
 
     private String name;
 
-    @PositiveOrZero
+    @PositiveOrZero(message = "{client.balance.negative}")
     private BigDecimal balance;
 }

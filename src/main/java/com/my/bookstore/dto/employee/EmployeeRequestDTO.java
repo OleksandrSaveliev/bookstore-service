@@ -14,21 +14,21 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class EmployeeRequestDTO {
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
+    @NotBlank(message = "{auth.email.required}")
+    @Email(message = "{auth.email.invalid}")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @NotBlank(message = "{auth.password.required}")
+    @Size(min = 6, message = "{auth.password.size}")
     private String password;
 
-    @NotBlank(message = "Name is required")
-    @Size(max = 100)
+    @NotBlank(message = "{auth.name.required}")
+    @Size(max = 100, message = "{employee.name.size.max}")
     private String name;
 
     private String phone;
 
-    @Past(message = "Birth date must be in the past")
-    @NotNull(message = "Birth date is required")
+    @Past(message = "{employee.birthDate.past}")
+    @NotNull(message = "{employee.birthDate.required}")
     private LocalDate birthDate;
 }

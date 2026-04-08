@@ -5,6 +5,7 @@ import com.my.bookstore.dto.employee.EmployeeResponseDTO;
 import com.my.bookstore.security.AuthEntryPointJwt;
 import com.my.bookstore.security.CustomAccessDeniedHandler;
 import com.my.bookstore.security.JwtUtils;
+import com.my.bookstore.security.OAuth2LoginSuccessHandler;
 import com.my.bookstore.service.EmployeeService;
 import com.my.bookstore.service.impl.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -52,6 +53,9 @@ class EmployeeControllerTest {
 
     @MockitoBean
     private CustomAccessDeniedHandler accessDeniedHandler;
+
+    @MockitoBean
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @BeforeEach
     void setUp() throws Exception {

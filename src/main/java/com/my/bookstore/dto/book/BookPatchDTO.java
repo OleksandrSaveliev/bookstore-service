@@ -20,18 +20,18 @@ public class BookPatchDTO {
     private String genre;
     private AgeGroup ageGroup;
 
-    @Positive
+    @Positive(message = "{book.price.positive}")
     private BigDecimal price;
 
-    @PastOrPresent
+    @PastOrPresent(message = "{book.publicationDate.invalid}")
     private LocalDate publicationDate;
 
     private String author;
 
-    @Positive
+    @Positive(message = "{book.pages.positive}")
     private Integer pages;
 
-    @PositiveOrZero
+    @PositiveOrZero(message = "{book.stock.negative}")
     private Integer stock;
 
     private String characteristics;
