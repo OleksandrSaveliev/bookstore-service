@@ -8,6 +8,7 @@ import com.my.bookstore.model.ClientProfile;
 import com.my.bookstore.model.User;
 import com.my.bookstore.model.enums.Role;
 import com.my.bookstore.repo.ClientProfileRepository;
+import com.my.bookstore.repo.OrderRepository;
 import com.my.bookstore.repo.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -35,7 +35,7 @@ class ClientServiceImplTest {
     @Mock
     UserRepository userRepository;
     @Mock
-    ModelMapper modelMapper;
+    OrderRepository orderRepository;
     @Mock
     PasswordEncoder passwordEncoder;
 
@@ -102,6 +102,18 @@ class ClientServiceImplTest {
 
         clientService.deleteClientById(1L);
 
+        verify(orderRepository).deleteAllByClientUserId(1L);
+        verify(clientProfileRepository).delete(profile);
+        verify(userRepository).deleteById(1L);
+    }
+
+    @Test
+    void deleteClient_hasOrders_deletesOrdersAndThenDeletesProfileAndUser() {
+        when(clientProfileRepository.findByUserId(1L)).thenReturn(Optional.of(profile));
+
+        clientService.deleteClientById(1L);
+
+        verify(orderRepository).deleteAllByClientUserId(1L);
         verify(clientProfileRepository).delete(profile);
         verify(userRepository).deleteById(1L);
     }

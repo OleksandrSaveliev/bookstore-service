@@ -6,10 +6,10 @@ import com.my.bookstore.exception.AlreadyExistException;
 import com.my.bookstore.exception.NotFoundException;
 import com.my.bookstore.model.ClientProfile;
 import com.my.bookstore.repo.ClientProfileRepository;
+import com.my.bookstore.repo.OrderRepository;
 import com.my.bookstore.repo.UserRepository;
 import com.my.bookstore.service.ClientService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ public class ClientServiceImpl implements ClientService {
 
     private final ClientProfileRepository clientProfileRepository;
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
+    private final OrderRepository orderRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -44,6 +44,7 @@ public class ClientServiceImpl implements ClientService {
     public void deleteClientById(Long id) {
         ClientProfile profile = clientProfileRepository.findByUserId(id)
                 .orElseThrow(() -> new NotFoundException("Client not found: " + id));
+        orderRepository.deleteAllByClientUserId(id);
         clientProfileRepository.delete(profile);
         userRepository.deleteById(id);
     }

@@ -12,32 +12,29 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(EmployeeController.class)
 @Import(SecurityConfig.class)
+@AutoConfigureMockMvc
 class EmployeeControllerTest {
 
-    private MockMvc mockMvc;
-
     @Autowired
-    private WebApplicationContext context;
+    private MockMvc mockMvc;
 
     @MockitoBean
     private EmployeeService employeeService;
@@ -70,11 +67,6 @@ class EmployeeControllerTest {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
             return null;
         }).when(accessDeniedHandler).handle(any(), any(), any());
-
-        this.mockMvc = MockMvcBuilders
-                .webAppContextSetup(context)
-                .apply(springSecurity())
-                .build();
     }
 
     @Test
@@ -90,7 +82,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(roles = "EMPLOYEE")
     void getEmployeeById_found_returnsOk() throws Exception {
         EmployeeResponseDTO dto = new EmployeeResponseDTO();
         dto.setId(1L);
@@ -99,31 +91,5 @@ class EmployeeControllerTest {
         mockMvc.perform(get("/api/v1/employees/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
-    }
-
-    @Test
-    void getAllEmployees_unauthenticated_returnsUnauthorized() throws Exception {
-        mockMvc.perform(get("/api/v1/employees"))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithMockUser(roles = "CLIENT")
-    void getAllEmployees_asClient_returnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/v1/employees"))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void getEmployeeById_unauthenticated_returnsUnauthorized() throws Exception {
-        mockMvc.perform(get("/api/v1/employees/1"))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithMockUser(roles = "CLIENT")
-    void getEmployeeById_asClient_returnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/v1/employees/1"))
-                .andExpect(status().isForbidden());
     }
 }

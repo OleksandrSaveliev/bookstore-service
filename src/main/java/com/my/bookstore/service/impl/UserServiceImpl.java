@@ -74,10 +74,12 @@ public class UserServiceImpl implements UserService {
 
         if (user.getRole() == Role.CLIENT) {
             clientService.deleteClientById(id);
-        } else if (user.getRole() == Role.EMPLOYEE) {
-            adminService.deleteEmployeeById(id);
+            return;
         }
-
+        if (user.getRole() == Role.EMPLOYEE) {
+            adminService.deleteEmployeeById(id);
+            return;
+        }
         userRepository.delete(user);
     }
 }

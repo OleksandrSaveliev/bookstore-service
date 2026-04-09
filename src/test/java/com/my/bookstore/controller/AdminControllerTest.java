@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.my.bookstore.config.SecurityConfig;
 import com.my.bookstore.dto.employee.EmployeeRequestDTO;
 import com.my.bookstore.dto.employee.EmployeeResponseDTO;
+import com.my.bookstore.security.AuthEntryPointJwt;
+import com.my.bookstore.security.CustomAccessDeniedHandler;
 import com.my.bookstore.security.JwtUtils;
 import com.my.bookstore.security.OAuth2LoginSuccessHandler;
-import com.my.bookstore.security.CustomAccessDeniedHandler;
 import com.my.bookstore.service.AdminService;
 import com.my.bookstore.service.UserService;
 import com.my.bookstore.service.impl.CustomUserDetailsService;
@@ -14,33 +15,29 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AdminController.class)
 @Import(SecurityConfig.class)
+@AutoConfigureMockMvc
 class AdminControllerTest {
 
-    private MockMvc mockMvc;
-
     @Autowired
-    private WebApplicationContext context;
+    private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -58,7 +55,7 @@ class AdminControllerTest {
     private JwtUtils jwtUtils;
 
     @MockitoBean
-    private AuthenticationEntryPoint unauthorizedHandler;
+    private AuthEntryPointJwt unauthorizedHandler;
 
     @MockitoBean
     private CustomAccessDeniedHandler accessDeniedHandler;
@@ -79,11 +76,6 @@ class AdminControllerTest {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
             return null;
         }).when(accessDeniedHandler).handle(any(), any(), any());
-
-        this.mockMvc = MockMvcBuilders
-                .webAppContextSetup(context)
-                .apply(springSecurity())
-                .build();
     }
 
     @Test

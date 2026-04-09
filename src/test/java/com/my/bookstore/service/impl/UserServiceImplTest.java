@@ -119,7 +119,7 @@ class UserServiceImplTest {
         userService.deleteUserById(1L);
 
         verify(clientService).deleteClientById(1L);
-        verify(userRepository).delete(user);
+        verify(userRepository, never()).delete(any());
     }
 
     @Test
@@ -130,7 +130,19 @@ class UserServiceImplTest {
         userService.deleteUserById(1L);
 
         verify(adminService).deleteEmployeeById(1L);
+        verify(userRepository, never()).delete(any());
+    }
+
+    @Test
+    void deleteUserById_asAdmin_deletesUser() {
+        user.setRole(Role.ADMIN);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        userService.deleteUserById(1L);
+
         verify(userRepository).delete(user);
+        verifyNoInteractions(clientService);
+        verifyNoInteractions(adminService);
     }
 
     @Test
