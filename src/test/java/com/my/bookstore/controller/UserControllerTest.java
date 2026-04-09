@@ -1,6 +1,5 @@
 package com.my.bookstore.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.my.bookstore.config.SecurityConfig;
 import com.my.bookstore.dto.auth.UserResponseDTO;
 import com.my.bookstore.security.AuthEntryPointJwt;
@@ -39,19 +38,14 @@ class UserControllerTest {
 
     @MockitoBean
     private UserService userService;
-
     @MockitoBean
     private CustomUserDetailsService userDetailsService;
-
     @MockitoBean
     private JwtUtils jwtUtils;
-
     @MockitoBean
     private AuthEntryPointJwt unauthorizedHandler;
-
     @MockitoBean
     private CustomAccessDeniedHandler accessDeniedHandler;
-
     @MockitoBean
     private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 

@@ -28,13 +28,10 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private ModelMapper modelMapper;
-
     @Mock
     private ClientService clientService;
-
     @Mock
     private AdminService adminService;
 
@@ -55,6 +52,7 @@ class UserServiceImplTest {
         responseDTO.setId(1L);
         responseDTO.setEmail("user@test.com");
     }
+
 
     @Test
     void getAllUsers_returnsList() {

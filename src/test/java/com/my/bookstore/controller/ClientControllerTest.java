@@ -40,25 +40,19 @@ class ClientControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @MockitoBean
     private ClientService clientService;
-
     @MockitoBean
     private CustomUserDetailsService userDetailsService;
-
     @MockitoBean
     private JwtUtils jwtUtils;
-
     @MockitoBean
     private AuthEntryPointJwt unauthorizedHandler;
-
     @MockitoBean
     private CustomAccessDeniedHandler accessDeniedHandler;
-
     @MockitoBean
     private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 

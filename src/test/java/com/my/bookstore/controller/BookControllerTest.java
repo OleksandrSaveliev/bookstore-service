@@ -45,25 +45,19 @@ class BookControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @MockitoBean
     private BookService bookService;
-
     @MockitoBean
     private CustomUserDetailsService userDetailsService;
-
     @MockitoBean
     private JwtUtils jwtUtils;
-
     @MockitoBean
     private AuthEntryPointJwt unauthorizedHandler;
-
     @MockitoBean
     private CustomAccessDeniedHandler accessDeniedHandler;
-
     @MockitoBean
     private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 

@@ -47,19 +47,14 @@ class OrderControllerTest {
 
     @MockitoBean
     private OrderService orderService;
-
     @MockitoBean
     private CustomUserDetailsService userDetailsService;
-
     @MockitoBean
     private JwtUtils jwtUtils;
-
     @MockitoBean
     private AuthEntryPointJwt unauthorizedHandler;
-
     @MockitoBean
     private CustomAccessDeniedHandler accessDeniedHandler;
-
     @MockitoBean
     private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 

@@ -104,7 +104,6 @@ class OrderServiceImplTest {
         SecurityContextHolder.clearContext();
     }
 
-
     @Test
     void getAllOrders_returnsMappedList() {
         when(orderRepository.findAll()).thenReturn(List.of(order));

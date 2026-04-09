@@ -44,22 +44,16 @@ class AdminControllerTest {
 
     @MockitoBean
     private AdminService adminService;
-
     @MockitoBean
     private UserService userService;
-
     @MockitoBean
     private CustomUserDetailsService userDetailsService;
-
     @MockitoBean
     private JwtUtils jwtUtils;
-
     @MockitoBean
     private AuthEntryPointJwt unauthorizedHandler;
-
     @MockitoBean
     private CustomAccessDeniedHandler accessDeniedHandler;
-
     @MockitoBean
     private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
